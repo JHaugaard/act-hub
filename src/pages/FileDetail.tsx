@@ -12,14 +12,12 @@ import { ArrowLeft, Trash2, ExternalLink, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { FileRecord } from '@/hooks/useFiles';
+import { type FileRecord, usePIs, useSponsors } from '@/hooks/useData';
 import { FileAttachmentsManager } from '@/components/FileAttachmentsManager';
 import { RelatedProposalsPopover } from '@/components/RelatedProposalsPopover';
 import { AutocompleteInput } from '@/components/ui/autocomplete-input';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { usePIs } from '@/hooks/useProposalData';
-import { useSponsors } from '@/hooks/useProposalData';
 
 const getStatusColor = (status: string) => {
   switch (status) {

@@ -7,7 +7,7 @@ import { ProposalForm } from '@/components/ProposalForm';
 import { ProposalsTable } from '@/components/ProposalsTable';
 import { StatusFilters } from '@/components/StatusFilters';
 import { SearchBar } from '@/components/SearchBar';
-import { useFiles, FileRecord } from '@/hooks/useFiles';
+import { useFiles, type FileRecord } from '@/hooks/useData';
 import { generateProposalsPDF } from '@/utils/pdfExport';
 
 const Proposals = () => {

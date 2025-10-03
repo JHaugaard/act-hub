@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useRelatedProposals } from '@/hooks/useRelatedProposals';
+import { useRelatedProposals } from '@/hooks/useData';
 import { format } from 'date-fns';
 
 interface RelatedProposalsPopoverProps {

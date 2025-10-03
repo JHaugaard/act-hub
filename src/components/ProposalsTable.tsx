@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { FileRecord, SortField, SortDirection } from '@/hooks/useFiles';
+import { FileRecord, SortField, SortDirection } from '@/hooks/useData';
 import { HighlightText } from './HighlightText';
 import { RelatedProposalsPopover } from './RelatedProposalsPopover';
 import { useNavigate } from 'react-router-dom';

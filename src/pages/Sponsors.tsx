@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Plus, Building2, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useSponsors } from '@/hooks/useProposalData';
+import { useSponsors } from '@/hooks/useData';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';

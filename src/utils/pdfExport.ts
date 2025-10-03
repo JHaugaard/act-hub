@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { FileRecord } from '@/hooks/useFiles';
+import { FileRecord } from '@/hooks/useData';
 import { format } from 'date-fns';
 
 export function generateProposalsPDF(

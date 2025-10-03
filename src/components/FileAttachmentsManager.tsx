@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Upload, Download, Trash2, FileText, X, CheckCircle, AlertCircle } from 'lucide-react';
-import { useFileAttachments } from '@/hooks/useFileAttachments';
+import { useFileAttachments } from '@/hooks/useData';
 import { getFileIcon, getFileTypeLabel, isValidFileType, getMaxFileSize, getMaxFiles } from '@/utils/fileUtils';
 import { cn } from '@/lib/utils';
 

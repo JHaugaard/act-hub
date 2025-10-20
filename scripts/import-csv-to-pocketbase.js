@@ -64,9 +64,23 @@ async function importData() {
   const pb = new PocketBase(POCKETBASE_URL);
 
   try {
-    // Authenticate
+    // Authenticate with admin
     console.log('🔐 Authenticating with PocketBase...');
-    await pb.admins.authWithPassword('admin@local.test', 'admin123456');
+    const authRes = await fetch(`${POCKETBASE_URL}/api/admins/auth-with-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identity: 'admin@local.test',
+        password: 'admin123456',
+      }),
+    });
+
+    if (!authRes.ok) {
+      throw new Error(`Authentication failed: ${authRes.statusText}`);
+    }
+
+    const { token, admin } = await authRes.json();
+    pb.authStore.save(token, admin);
     console.log('✅ Authenticated\n');
 
     // Create maps for PI and Sponsor name to ID lookup (to handle relationships)

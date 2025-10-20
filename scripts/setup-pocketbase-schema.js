@@ -8,7 +8,7 @@
  * Run this AFTER starting PocketBase container
  */
 
-const PocketBase = require('pocketbase/cjs');
+import PocketBase from 'pocketbase';
 
 const POCKETBASE_URL = process.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
 
@@ -18,10 +18,60 @@ async function setupSchema() {
   const pb = new PocketBase(POCKETBASE_URL);
 
   try {
-    // Authenticate
-    console.log('🔐 Authenticating...');
-    await pb.admins.authWithPassword('admin@local.test', 'admin123456');
-    console.log('✅ Authenticated\n');
+    // Authenticate with admin
+    console.log('🔐 Authenticating with admin...');
+    const response = await fetch(`${POCKETBASE_URL}/api/admins/auth-with-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identity: 'admin@local.test',
+        password: 'admin123456',
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      pb.authStore.save(data.token, data.admin);
+      console.log('✅ Authenticated\n');
+    } else if (response.status === 400) {
+      // Admin might not exist, try creating one
+      console.log('📝 Creating admin user...');
+      const createResponse = await fetch(`${POCKETBASE_URL}/api/admins`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'admin@local.test',
+          password: 'admin123456',
+          passwordConfirm: 'admin123456',
+        }),
+      });
+
+      if (createResponse.ok) {
+        console.log('✅ Admin user created\n');
+
+        // Now authenticate
+        const authResponse = await fetch(`${POCKETBASE_URL}/api/admins/auth-with-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            identity: 'admin@local.test',
+            password: 'admin123456',
+          }),
+        });
+
+        if (authResponse.ok) {
+          const data = await authResponse.json();
+          pb.authStore.save(data.token, data.admin);
+          console.log('✅ Authenticated\n');
+        } else {
+          throw new Error(`Auth failed: ${authResponse.statusText}`);
+        }
+      } else {
+        throw new Error(`Admin creation failed: ${createResponse.statusText}`);
+      }
+    } else {
+      throw new Error(`Auth failed: ${response.statusText}`);
+    }
 
     // Create PIs collection
     console.log('📝 Creating PIs collection...');
@@ -89,7 +139,7 @@ async function setupSchema() {
               values: [
                 'In',
                 'Pending',
-                'Pending Signatures',
+                'Pending Signature',
                 'Process',
                 'Done',
                 'On Hold',
@@ -200,8 +250,7 @@ async function setupSchema() {
     console.log('   - file_attachments\n');
     console.log('Next steps:');
     console.log('1. Verify in admin UI: http://localhost:8091');
-    console.log('2. Run export script: node scripts/export-supabase-data.js');
-    console.log('3. Run import script: node scripts/import-to-pocketbase.js\n');
+    console.log('2. Run import script: node scripts/import-csv-to-pocketbase.js\n');
 
   } catch (error) {
     console.error('❌ Schema setup failed:', error.message);

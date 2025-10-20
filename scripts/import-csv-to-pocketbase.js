@@ -10,41 +10,38 @@
  * - data-for-importing/files.csv
  */
 
-const fs = require('fs');
-const path = require('path');
-const csv = require('csv-parse/sync');
-const PocketBase = require('pocketbase/cjs');
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { parse } from 'csv-parse/sync';
+import PocketBase from 'pocketbase';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const POCKETBASE_URL = process.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
-const DATA_DIR = path.join(__dirname, '../data-for-importing');
+const DATA_DIR = join(__dirname, '../data-for-importing');
 
 // CSV file paths
 const CSV_FILES = {
-  pis: path.join(DATA_DIR, 'pis.csv'),
-  sponsors: path.join(DATA_DIR, 'sponsors.csv'),
-  files: path.join(DATA_DIR, 'files.csv'),
+  pis: join(DATA_DIR, 'pis.csv'),
+  sponsors: join(DATA_DIR, 'sponsors.csv'),
+  files: join(DATA_DIR, 'files.csv'),
 };
 
 /**
  * Parse CSV file
  */
 function parseCSV(filePath) {
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  const fileContent = readFileSync(filePath, 'utf-8');
   // Remove BOM if present
   const cleanContent = fileContent.replace(/^\ufeff/, '');
-  return csv.parse(cleanContent, {
+  return parse(cleanContent, {
     columns: true,
     skip_empty_lines: true,
     trim: true,
   });
-}
-
-/**
- * Generate ID from name (simple hash)
- * PocketBase uses 15-char alphanumeric IDs by default
- */
-function generateId() {
-  return Math.random().toString(36).substring(2, 17).padEnd(15, '0');
 }
 
 /**

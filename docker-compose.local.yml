@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  pocketbase:
+    image: ghcr.io/pocketbase/pocketbase:latest
+    container_name: proposal_tracker_pocketbase_local
+    ports:
+      - "8090:8090"  # API
+      - "8091:8091"  # Admin UI
+    volumes:
+      # Mount to external drive for data persistence and inspection
+      - /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data:/pb_data
+    environment:
+      - POCKETBASE_SUPERUSER_EMAIL=admin@local.test
+      - POCKETBASE_SUPERUSER_PASSWORD=admin123456
+    command: serve --http=0.0.0.0:8090 --migrationsDir=/pb_data/migrations
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pocketbase_data:
+    driver: local

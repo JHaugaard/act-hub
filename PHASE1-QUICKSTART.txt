@@ -1,0 +1,181 @@
+================================================================================
+POCKETBASE MIGRATION - PHASE 1 QUICK START CHECKLIST
+================================================================================
+
+PREPARE (5 mins)
+================
+☐ Verify external drive is mounted:
+  ls /Volumes/990-Pro-2TB/development/proposal-tracker/
+
+☐ Verify Docker is running:
+  docker --version && docker-compose --version
+
+☐ Verify you're in project directory:
+  cd /Users/john/Documents/dev-top/proposal_tracker_2
+
+
+STEP 1: START POCKETBASE (5 mins)
+==================================
+☐ Start container:
+  docker-compose -f docker-compose.local.yml up -d
+
+☐ Verify running:
+  docker-compose -f docker-compose.local.yml logs pocketbase
+  (Look for: "Server started at" message)
+
+☐ Test API:
+  curl http://localhost:8090/api/health
+  (Should return: {"code":200,"message":"."})
+
+☐ Open admin UI:
+  http://localhost:8091
+  Login: admin@local.test / admin123456
+  (You should see empty PocketBase interface)
+
+
+STEP 2: CREATE SCHEMA (3 mins)
+==============================
+☐ Run schema setup:
+  node scripts/setup-pocketbase-schema.js
+
+☐ Verify output shows:
+  ✅ PIs collection created
+  ✅ Sponsors collection created
+  ✅ Files collection created
+  ✅ File Attachments collection created
+
+☐ Refresh admin UI:
+  http://localhost:8091
+  (You should see 4 collections in sidebar)
+
+
+STEP 3: EXPORT DATA (2 mins)
+============================
+☐ Export from Lovable Supabase:
+  node scripts/export-supabase-data.js
+
+☐ Wait for completion, verify output shows:
+  ✅ Exported PIs
+  ✅ Exported Sponsors
+  ✅ Exported Files
+  ✅ Exported Attachments
+
+☐ Verify export file created:
+  ls -lah data-exports/ | head -1
+
+
+STEP 4: IMPORT DATA (2 mins)
+============================
+☐ Import to PocketBase:
+  node scripts/import-to-pocketbase.js
+
+☐ Wait for completion, verify output shows:
+  ✅ Imported PIs
+  ✅ Imported Sponsors
+  ✅ Imported Files
+  ✅ Imported File Attachments
+
+☐ Verify in admin UI:
+  - Click "files" collection
+  - Should see 36 proposals listed
+  - Click a file, see all fields populated
+
+
+STEP 5: SWITCH APP TO POCKETBASE (2 mins)
+==========================================
+☐ Edit .env file:
+  nano .env
+
+  Change this line:
+    VITE_USE_MOCK_DATA="true"
+
+  To these lines:
+    VITE_DATA_SOURCE="pocketbase"
+    VITE_POCKETBASE_URL="http://localhost:8090"
+
+  Save: Ctrl+X, then Y, then Enter
+
+☐ Verify .env changed:
+  grep VITE_DATA_SOURCE .env
+
+☐ Restart dev server:
+  npm run dev
+
+☐ Watch console output:
+  Should see: 🔧 Data Source: POCKETBASE
+
+
+STEP 6: TEST APPLICATION (20 mins)
+===================================
+In browser at http://localhost:3000:
+
+☐ Dashboard page:
+  - Shows proposal count (should be 36)
+  - Status breakdown displays
+  - Recent proposals list shows
+
+☐ Proposals page:
+  - See all 36 proposals listed
+  - Search works (try searching for a PI name)
+  - Filter by status works
+  - Sorting works
+  - Click a proposal to view details
+
+☐ Proposal details page:
+  - See all proposal fields
+  - Status can be changed and saves
+  - See related proposals
+  - See attachments (if any)
+
+☐ PIs page:
+  - See 12 PIs listed
+  - Can create new PI
+
+☐ Sponsors page:
+  - See 14 sponsors listed
+  - Can create new sponsor
+
+☐ DB Distiller page:
+  - Can upload Excel files
+  - Processing works
+
+If all tests pass ✅ → PHASE 1 COMPLETE!
+
+
+TROUBLESHOOTING
+===============
+If something fails:
+
+1. Check PocketBase logs:
+   docker-compose -f docker-compose.local.yml logs -f pocketbase
+
+2. Verify it's running:
+   docker-compose -f docker-compose.local.yml ps
+
+3. Check data in admin UI:
+   http://localhost:8091 (login: admin@local.test / admin123456)
+
+4. Check external drive:
+   ls -la /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/
+
+5. View browser console errors:
+   Chrome/Firefox DevTools → Console tab
+
+For detailed help, see PHASE1-SETUP.md
+
+
+CLEANUP (if you need to start over)
+====================================
+☐ Stop containers:
+  docker-compose -f docker-compose.local.yml down
+
+☐ Clear data (WARNING: Deletes all imported data):
+  rm -rf /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/*
+
+☐ Then start over from STEP 1
+
+
+TOTAL TIME: ~40 minutes
+SUCCESS: See all data from Supabase now running in local PocketBase!
+
+================================================================================

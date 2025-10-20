@@ -5,10 +5,15 @@
  * Usage in components:
  *   import { useFiles, usePIs, useSponsors } from '@/hooks/useData'
  *
- * This will use either mock or real Supabase hooks based on VITE_USE_MOCK_DATA
+ * This will use either mock, PocketBase, or real Supabase hooks based on VITE_DATA_SOURCE
+ * Environment: VITE_DATA_SOURCE = "mock" | "pocketbase" | "supabase"
  */
 
-import { USE_MOCK_DATA } from '@/config/dataSource';
+const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || import.meta.env.VITE_USE_MOCK_DATA === 'true' ? 'mock' : 'supabase';
+const USE_MOCK_DATA = DATA_SOURCE === 'mock';
+const USE_POCKETBASE = DATA_SOURCE === 'pocketbase';
+
+console.log(`🔧 Data Source: ${DATA_SOURCE.toUpperCase()}`);
 
 // Real Supabase hooks
 import { useFiles as useRealFiles } from './useFiles';
@@ -16,6 +21,13 @@ import { usePIs as useRealPIs, useSponsors as useRealSponsors } from './usePropo
 import { useDashboard as useRealDashboard } from './useDashboard';
 import { useRelatedProposals as useRealRelatedProposals } from './useRelatedProposals';
 import { useFileAttachments as useRealFileAttachments } from './useFileAttachments';
+
+// PocketBase hooks
+import { usePocketBaseFiles } from './usePocketBaseFiles';
+import { usePocketBasePIs, usePocketBaseSponsors } from './usePocketBaseProposalData';
+import { usePocketBaseDashboard } from './usePocketBaseDashboard';
+import { usePocketBaseRelatedProposals } from './usePocketBaseRelatedProposals';
+import { usePocketBaseFileAttachments } from './usePocketBaseFileAttachments';
 
 // Mock hooks
 import { useMockFiles } from './mock/useMockFiles';
@@ -32,12 +44,41 @@ if (USE_MOCK_DATA) {
 }
 
 // Export the appropriate hooks based on configuration
-export const useFiles = USE_MOCK_DATA ? useMockFiles : useRealFiles;
-export const usePIs = USE_MOCK_DATA ? useMockPIs : useRealPIs;
-export const useSponsors = USE_MOCK_DATA ? useMockSponsors : useRealSponsors;
-export const useDashboard = USE_MOCK_DATA ? useMockDashboard : useRealDashboard;
-export const useRelatedProposals = USE_MOCK_DATA ? useMockRelatedProposals : useRealRelatedProposals;
-export const useFileAttachments = USE_MOCK_DATA ? useMockFileAttachments : useRealFileAttachments;
+export const useFiles = USE_MOCK_DATA
+  ? useMockFiles
+  : USE_POCKETBASE
+    ? usePocketBaseFiles
+    : useRealFiles;
+
+export const usePIs = USE_MOCK_DATA
+  ? useMockPIs
+  : USE_POCKETBASE
+    ? usePocketBasePIs
+    : useRealPIs;
+
+export const useSponsors = USE_MOCK_DATA
+  ? useMockSponsors
+  : USE_POCKETBASE
+    ? usePocketBaseSponsors
+    : useRealSponsors;
+
+export const useDashboard = USE_MOCK_DATA
+  ? useMockDashboard
+  : USE_POCKETBASE
+    ? usePocketBaseDashboard
+    : useRealDashboard;
+
+export const useRelatedProposals = USE_MOCK_DATA
+  ? useMockRelatedProposals
+  : USE_POCKETBASE
+    ? usePocketBaseRelatedProposals
+    : useRealRelatedProposals;
+
+export const useFileAttachments = USE_MOCK_DATA
+  ? useMockFileAttachments
+  : USE_POCKETBASE
+    ? usePocketBaseFileAttachments
+    : useRealFileAttachments;
 
 // Also export types for convenience
 export type { FileRecord, SortField, SortDirection } from './useFiles';

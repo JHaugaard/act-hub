@@ -2,7 +2,7 @@
  * Mock Sample Data - Realistic data based on actual application usage
  */
 
-import { generateId } from './mockStorage';
+import { generateId, mockStorage, STORAGE_KEYS } from './mockStorage';
 
 // Sample PIs from screenshots
 export const mockPIs = [
@@ -178,8 +178,6 @@ export const generateMockFiles = (pis: any[], sponsors: any[]) => {
 
 // Initialize mock data in localStorage
 export const initializeMockData = () => {
-  const { mockStorage, STORAGE_KEYS } = require('./mockStorage');
-
   // Only initialize if no data exists
   if (mockStorage.getAll(STORAGE_KEYS.PIS).length === 0) {
     mockStorage.setInitialData(STORAGE_KEYS.PIS, mockPIs);

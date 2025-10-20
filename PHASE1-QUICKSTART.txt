@@ -49,35 +49,26 @@ STEP 2: CREATE SCHEMA (3 mins)
   (You should see 4 collections in sidebar)
 
 
-STEP 3: EXPORT DATA (2 mins)
-============================
-☐ Export from Lovable Supabase:
-  node scripts/export-supabase-data.js
+STEP 3: IMPORT CSV DATA (2 mins)
+================================
+☐ Import from CSV files:
+  node scripts/import-csv-to-pocketbase.js
 
 ☐ Wait for completion, verify output shows:
-  ✅ Exported PIs
-  ✅ Exported Sponsors
-  ✅ Exported Files
-  ✅ Exported Attachments
+  ✅ Importing PIs...
+  ✅ Importing Sponsors...
+  ✅ Importing Files (Proposals)...
+  ✅ CSV import complete!
 
-☐ Verify export file created:
-  ls -lah data-exports/ | head -1
-
-
-STEP 4: IMPORT DATA (2 mins)
-============================
-☐ Import to PocketBase:
-  node scripts/import-to-pocketbase.js
-
-☐ Wait for completion, verify output shows:
-  ✅ Imported PIs
-  ✅ Imported Sponsors
-  ✅ Imported Files
-  ✅ Imported File Attachments
+☐ Check summary shows correct counts:
+  - PIs: 504
+  - Sponsors: 526
+  - Files: 1126 (or close to these numbers)
 
 ☐ Verify in admin UI:
+  - Visit http://localhost:8091
   - Click "files" collection
-  - Should see 36 proposals listed
+  - Should see all proposals listed
   - Click a file, see all fields populated
 
 
@@ -175,7 +166,7 @@ CLEANUP (if you need to start over)
 ☐ Then start over from STEP 1
 
 
-TOTAL TIME: ~40 minutes
-SUCCESS: See all data from Supabase now running in local PocketBase!
+TOTAL TIME: ~35 minutes (faster since CSV data is local)
+SUCCESS: See all production data (from CSVs) now running in local PocketBase!
 
 ================================================================================

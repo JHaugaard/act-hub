@@ -1,6 +1,6 @@
 ╔════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                ║
-║             PROPOSAL TRACKER - POCKETBASE MIGRATION ARCHITECTURE              ║
+║             PROPOSAL TRACKER - POCKETBASE MIGRATION ARCHITECTURE               ║
 ║                                                                                ║
 ╚════════════════════════════════════════════════════════════════════════════════╝
 
@@ -11,18 +11,18 @@ PHASE 1: LOCAL DEVELOPMENT
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         YOUR MACHINE (MacBook)                              │
 │                                                                             │
-│  ┌────────────────────────────────┐                                        │
-│  │   React Dev Server (port 3000) │                                        │
-│  │   npm run dev                  │                                        │
-│  │                                │                                        │
-│  │  ├── Pages/                    │                                        │
-│  │  ├── Components/               │                                        │
-│  │  └── hooks/useData.ts ─────┐   │                                        │
-│  │     (hook factory)         │   │                                        │
-│  └────────────────────────────┼───┘                                        │
-│                               │                                            │
-│                  HTTP (REST)  │                                            │
-│                               │                                            │
+│  ┌────────────────────────────────┐                                         │
+│  │   React Dev Server (port 3000) │                                         │
+│  │   npm run dev                  │                                         │
+│  │                                │                                         │
+│  │  ├── Pages/                    │                                         │
+│  │  ├── Components/               │                                         │
+│  │  └── hooks/useData.ts ─────┐   │                                         │
+│  │     (hook factory)         │   │                                         │
+│  └────────────────────────────┼───┘                                         │
+│                               │                                             │
+│                  HTTP (REST)  │                                             │
+│                               │                                             │
 │  ┌────────────────────────────▼───┐        ┌──────────────────────────────┐
 │  │     PocketBase Container       │        │  EXTERNAL DRIVE              │
 │  │     (Docker)                   │        │  /Volumes/990-Pro-2TB/       │
@@ -31,14 +31,14 @@ PHASE 1: LOCAL DEVELOPMENT
 │  │  ┌────────────────────────┐    │        │  pocketbase-data/            │
 │  │  │ Collections:           │    │        │                              │
 │  │  │ • pis                  │    │        │  ├── pb.db (SQLite)          │
-│  │  │ • sponsors             │    │────────┼──├── pb_public/ (files)     │
+│  │  │ • sponsors             │    │────────┼──├── pb_public/ (files)      │
 │  │  │ • files (proposals)    │    │        │  └── migrations/             │
 │  │  │ • file_attachments     │    │        │                              │
 │  │  └────────────────────────┘    │        │  (Your actual data lives here)
 │  └────────────────────────────────┘        └──────────────────────────────┘
 │                                                                             │
-│           Admin UI: http://localhost:8091                                  │
-│           (View collections, inspect data)                                │
+│           Admin UI: http://localhost:8091                                   │
+│           (View collections, inspect data)                                  │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
@@ -66,14 +66,14 @@ PHASE 1: DATA MIGRATION FLOW
            │
            ▼
 ┌──────────────────────────────────────────┐
-│ LOCAL POCKETBASE                        │
+│ LOCAL POCKETBASE                         │
 │ (In Docker container)                    │
 │                                          │
-│ Collections now have data:              │
-│ • 12 PIs                                │
-│ • 14 Sponsors                           │
-│ • 36 Files (proposals)                  │
-│ • X File Attachments                    │
+│ Collections now have data:               │
+│ • 12 PIs                                 │
+│ • 14 Sponsors                            │
+│ • 36 Files (proposals)                   │
+│ • X File Attachments                     │
 └──────────────┬───────────────────────────┘
                │
                │ persists to
@@ -90,7 +90,7 @@ PHASE 1: HOOK FACTORY PATTERN
 │                         src/hooks/useData.ts                                 │
 │                        (Hook Factory Pattern)                                │
 │                                                                              │
-│  Environment Variable: VITE_DATA_SOURCE                                     │
+│  Environment Variable: VITE_DATA_SOURCE                                      │
 │                                                                              │
 │  ┌─────────────────────────────────────────────────────────────────────────┐
 │  │ If "mock":                                                              │
@@ -100,7 +100,7 @@ PHASE 1: HOOK FACTORY PATTERN
 │  └─────────────────────────────────────────────────────────────────────────┘
 │                                                                              │
 │  ┌─────────────────────────────────────────────────────────────────────────┐
-│  │ If "pocketbase" (YOUR CHOICE FOR PHASE 1):                             │
+│  │ If "pocketbase" (YOUR CHOICE FOR PHASE 1):                              │
 │  │   export useFiles = usePocketBaseFiles                                  │
 │  │   export usePIs = usePocketBasePIs                                      │
 │  │   (Data from local Docker PocketBase)                                   │
@@ -126,16 +126,16 @@ PHASE 2: VPS PREPARATION (Coming After Phase 1)
 ═════════════════════════════════════════════════════════════════════════════════
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                   HOSTINGER VPS (bare-metal)                                │
+│                   HOSTINGER VPS (bare-metal)                                 │
 │                                                                              │
 │  ┌─────────────────────────────────────────────────────────────────────────┐
-│  │ Nginx Reverse Proxy (ports 80/443)                                     │
-│  │ • Listens on yourdomain.com:80 (HTTP)                                  │
-│  │ • Listens on yourdomain.com:443 (HTTPS + SSL cert)                     │
-│  │ • Routes traffic to containers                                         │
+│  │ Nginx Reverse Proxy (ports 80/443)                                      │
+│  │ • Listens on yourdomain.com:80 (HTTP)                                   │
+│  │ • Listens on yourdomain.com:443 (HTTPS + SSL cert)                      │
+│  │ • Routes traffic to containers                                          │
 │  │                                                                         │
-│  │   yourdomain.com/api/* → PocketBase:8090                               │
-│  │   yourdomain.com/*     → React App:3000                                │
+│  │   yourdomain.com/api/* → PocketBase:8090                                │
+│  │   yourdomain.com/*     → React App:3000                                 │
 │  └─────────────────────────────────────────────────────────────────────────┘
 │                          │
 │         ┌────────────────┴────────────────┐
@@ -174,29 +174,29 @@ PHASE 3: PRODUCTION DEPLOYMENT
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                        DEPLOYMENT PROCESS                                    │
 │                                                                              │
-│ 1. Build Docker images (on your machine)                                    │
-│    • React app image (npm run build → Docker)                               │
-│    • PocketBase image (already exists on Docker Hub)                        │
+│ 1. Build Docker images (on your machine)                                     │
+│    • React app image (npm run build → Docker)                                │
+│    • PocketBase image (already exists on Docker Hub)                         │
 │                                                                              │
-│ 2. Push to VPS                                                              │
-│    • SSH into VPS                                                           │
-│    • Pull Docker images                                                     │
+│ 2. Push to VPS                                                               │
+│    • SSH into VPS                                                            │
+│    • Pull Docker images                                                      │
 │                                                                              │
-│ 3. Start containers via docker-compose                                      │
-│    docker-compose up -d                                                     │
-│    • PocketBase starts on 8090/8091                                         │
-│    • React app starts on 3000                                               │
-│    • Nginx routes traffic from 80/443 to containers                         │
+│ 3. Start containers via docker-compose                                       │
+│    docker-compose up -d                                                      │
+│    • PocketBase starts on 8090/8091                                          │
+│    • React app starts on 3000                                                │
+│    • Nginx routes traffic from 80/443 to containers                          │
 │                                                                              │
-│ 4. Restore production data                                                  │
-│    • Copy production backup to VPS                                          │
-│    • PocketBase restores from backup                                        │
-│    • All data available instantly                                           │
+│ 4. Restore production data                                                   │
+│    • Copy production backup to VPS                                           │
+│    • PocketBase restores from backup                                         │
+│    • All data available instantly                                            │
 │                                                                              │
-│ 5. Verify                                                                   │
-│    • Test all features work                                                 │
-│    • Check logs for errors                                                  │
-│    • Monitor performance                                                    │
+│ 5. Verify                                                                    │
+│    • Test all features work                                                  │
+│    • Check logs for errors                                                   │
+│    • Monitor performance                                                     │
 │                                                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
 

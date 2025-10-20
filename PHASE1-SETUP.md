@@ -1,8 +1,8 @@
 # Phase 1: Local PocketBase Setup Guide
 
-This guide walks you through setting up PocketBase locally with Docker on your machine, migrating all data from your Lovable Supabase instance, and testing the application locally.
+This guide walks you through setting up PocketBase locally with Docker on your machine, importing all data from your production CSV files, and testing the application locally.
 
-**Estimated Time: 2-3 hours**
+**Estimated Time: ~40 minutes**
 
 ---
 
@@ -11,7 +11,10 @@ This guide walks you through setting up PocketBase locally with Docker on your m
 - Docker and Docker Compose installed on your machine
 - External drive mounted at: `/Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data`
 - Node.js and npm installed
-- Your `.env` file with valid Supabase credentials (for data export)
+- CSV data files in `data-for-importing/` directory:
+  - `pis.csv`
+  - `sponsors.csv`
+  - `files.csv`
 
 ---
 
@@ -65,77 +68,50 @@ node scripts/setup-pocketbase-schema.js
 
 ---
 
-## Step 3: Export Your Lovable Supabase Data
+## Step 3: Import Data from CSV Files
 
-This script pulls ALL your production data from your Lovable Supabase instance.
+This script reads your production CSV files and imports them into PocketBase.
 
 ```bash
-# Export all data from Supabase
-node scripts/export-supabase-data.js
+# Import CSV data into PocketBase
+node scripts/import-csv-to-pocketbase.js
 
 # Output should show:
-# 📥 Exporting PIs... ✅ Exported 12 PIs
-# 📥 Exporting Sponsors... ✅ Exported 14 Sponsors
-# 📥 Exporting Files... ✅ Exported 36 Files
-# 📥 Exporting File Attachments... ✅ Exported X Attachments
-# ✅ Export complete!
-# 📁 Data saved to: data-exports/supabase-export-TIMESTAMP.json
+# 📥 Importing PIs...
+# ✅ Imported 504 PIs
+#
+# 📥 Importing Sponsors...
+# ✅ Imported 526 Sponsors
+#
+# 📥 Importing Files (Proposals)...
+# ✅ Imported 1126 Files
+# ✅ CSV import complete!
 ```
 
 **What's happening:**
-- Connects to your live Supabase using credentials in `.env`
-- Fetches all records from each table
-- Saves as a JSON file for importing into PocketBase
-- The export file is timestamped and saved in `data-exports/`
-
-**Check the export:**
-```bash
-# See the most recent export file
-ls -lah data-exports/ | head -5
-cat data-exports/supabase-export-*.json | head -20
-```
-
----
-
-## Step 4: Import Data into PocketBase
-
-This script takes the exported JSON data and imports it into your local PocketBase instance.
-
-```bash
-# Import the data (will auto-find the most recent export)
-node scripts/import-to-pocketbase.js
-
-# Output should show:
-# 📥 Importing 12 PIs... ✅ Imported PIs
-# 📥 Importing 14 Sponsors... ✅ Imported Sponsors
-# 📥 Importing 36 Files... ✅ Imported Files
-# 📥 Importing X Attachments... ✅ Imported File Attachments
-# ✅ Import complete!
-```
-
-**What's happening:**
-- Authenticates with PocketBase admin user
-- Inserts all records from the JSON export
-- Skips duplicate records (uses IDs from Supabase)
-- Creates the full mirror of your production data locally
+- Reads all three CSV files from `data-for-importing/`
+- Creates PI records from `pis.csv`
+- Creates Sponsor records from `sponsors.csv`
+- Creates File records from `files.csv` with proper relationships
+- Handles missing/empty fields gracefully
+- Generates PocketBase IDs and maintains relationships
 
 **Verify in Admin UI:**
 - Refresh http://localhost:8091
 - Click into "files" collection
-- You should see all 36 proposals with their data
+- You should see all 1126+ proposals with their data
+- Click "pis" collection - should see 504 PIs
+- Click "sponsors" collection - should see 526 sponsors
 
 ---
 
-## Step 5: Update Application Configuration
+## Step 4: Update Application Configuration
 
 Tell the app to use PocketBase instead of Supabase for data.
 
 ```bash
 # Edit .env
-# Change this line:
-# VITE_USE_MOCK_DATA="true"
-
-# To this:
+# Change/add these lines:
 VITE_DATA_SOURCE="pocketbase"
 VITE_POCKETBASE_URL="http://localhost:8090"
 
@@ -152,7 +128,7 @@ If you see `POCKETBASE` in the browser console, you're connected!
 
 ---
 
-## Step 6: Test the Application
+## Step 5: Test the Application
 
 Now test all the features of the app with your real production data in PocketBase.
 
@@ -211,14 +187,19 @@ docker-compose -f docker-compose.local.yml restart pocketbase
 
 ### Data not imported
 ```bash
-# Verify export file exists
-ls -la data-exports/
+# Verify CSV files exist
+ls -la data-for-importing/
 
 # Check admin UI to see what data is there
 # http://localhost:8091
 
-# Try importing specific file
-node scripts/import-to-pocketbase.js data-exports/supabase-export-YOUR-FILENAME.json
+# Verify schema was created (collections should exist)
+# If not, run: node scripts/setup-pocketbase-schema.js
+
+# Try import again
+node scripts/import-csv-to-pocketbase.js
+
+# Check import logs for errors
 ```
 
 ### App not connecting to PocketBase
@@ -273,11 +254,8 @@ docker-compose -f docker-compose.local.yml down
 # Create schema
 node scripts/setup-pocketbase-schema.js
 
-# Export Supabase data
-node scripts/export-supabase-data.js
-
-# Import to PocketBase
-node scripts/import-to-pocketbase.js
+# Import CSV data to PocketBase
+node scripts/import-csv-to-pocketbase.js
 
 # Start dev server
 npm run dev
@@ -287,6 +265,9 @@ npm run dev
 
 # Access PocketBase API
 # http://localhost:8090
+
+# Verify CSV files ready
+ls -la data-for-importing/
 
 # View external drive data
 ls -la /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/

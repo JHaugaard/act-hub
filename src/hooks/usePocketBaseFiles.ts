@@ -4,8 +4,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { pb } from '@/integrations/pocketbase/client';
+import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
 import { useToast } from '@/hooks/use-toast';
+
+const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
 
 export interface FileRecord {
   id: string;
@@ -40,14 +42,37 @@ export function usePocketBaseFiles() {
   const fetchFiles = async () => {
     setLoading(true);
     try {
-      // PocketBase query with expand to get related PI and Sponsor data
-      const records = await pb.collection('files').getFullList({
-        sort: '-created_at',
-        expand: 'pi_id,sponsor_id',
-      });
+      // Ensure authenticated before fetching
+      await ensurePocketBaseAuth();
+
+      // Fetch files using REST API with pagination to handle large result sets
+      let allRecords: any[] = [];
+      let page = 1;
+      let hasMore = true;
+      const pageSize = 500;
+
+      while (hasMore) {
+        const response = await fetch(
+          `${POCKETBASE_URL}/api/collections/files/records?page=${page}&perPage=${pageSize}&sort=-date_received&expand=pi_id,sponsor_id`,
+          {
+            headers: {
+              'Authorization': `Bearer ${pb.authStore.token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch files: ${response.status}`);
+        }
+
+        const data = await response.json();
+        allRecords = allRecords.concat(data.items || []);
+        hasMore = page < data.totalPages;
+        page++;
+      }
 
       // Transform PocketBase records to match FileRecord interface
-      const formattedFiles: FileRecord[] = records.map((record: any) => ({
+      const formattedFiles: FileRecord[] = allRecords.map((record: any) => ({
         id: record.id,
         db_no: record.db_no,
         status: record.status,
@@ -61,8 +86,8 @@ export function usePocketBaseFiles() {
         updated_at: record.updated_at,
         pi_id: record.pi_id,
         sponsor_id: record.sponsor_id,
-        pi_name: record.expand?.pi_id?.name || '',
-        sponsor_name: record.expand?.sponsor_id?.name || '',
+        pi_name: record.pi_name || record.expand?.pi_id?.name || '',
+        sponsor_name: record.sponsor_name || record.expand?.sponsor_id?.name || '',
       }));
 
       console.log(`✅ Loaded ${formattedFiles.length} total proposals from PocketBase`);

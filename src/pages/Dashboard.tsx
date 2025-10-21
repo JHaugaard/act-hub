@@ -72,7 +72,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {loading ? '...' : (stats.statusCounts[status] || 0)}
+                {loading ? '...' : (stats?.statusCounts[status] || 0)}
               </div>
               <p className="text-xs text-muted-foreground">
                 proposals

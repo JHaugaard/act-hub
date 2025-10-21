@@ -20,4 +20,36 @@ pb.authStore.save(
   pb.authStore.model
 );
 
+/**
+ * Ensure PocketBase client is authenticated
+ * Attempts to authenticate with default admin credentials if needed
+ */
+export async function ensurePocketBaseAuth(): Promise<boolean> {
+  try {
+    if (pb.authStore.isValid) {
+      return true;
+    }
+
+    const authRes = await fetch(`${POCKETBASE_URL}/api/admins/auth-with-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identity: 'admin@local.test',
+        password: 'admin123456',
+      }),
+    });
+
+    if (authRes.ok) {
+      const { token, admin } = await authRes.json();
+      pb.authStore.save(token, admin);
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Failed to authenticate with PocketBase:', error);
+    return false;
+  }
+}
+
 export default pb;

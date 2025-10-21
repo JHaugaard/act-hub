@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { pb } from '@/integrations/pocketbase/client';
+import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
 
 export interface RelatedProposal {
   id: string;
@@ -15,75 +15,74 @@ export interface RelatedProposal {
   relationshipType: 'pi' | 'sponsor';
 }
 
-export function usePocketBaseRelatedProposals(fileId?: string) {
+export function usePocketBaseRelatedProposals(entityId?: string | null, entityType: 'pi' | 'sponsor' = 'pi') {
   const [relatedProposals, setRelatedProposals] = useState<RelatedProposal[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchRelatedProposals = async (id?: string) => {
-    if (!id && !fileId) return;
+    if (!id && !entityId) return;
 
     setLoading(true);
     try {
-      const targetFileId = id || fileId;
+      // Ensure authenticated before fetching
+      await ensurePocketBaseAuth();
 
-      // Get the current file to find related PI and Sponsor
-      const currentFile = await pb.collection('files').getOne(targetFileId, {
-        expand: 'pi_id,sponsor_id',
-      });
+      const targetId = id || entityId;
+      const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
 
-      const piId = currentFile.pi_id;
-      const sponsorId = currentFile.sponsor_id;
+      // Query PocketBase REST API to find files with matching PI or Sponsor
+      const filterField = entityType === 'pi' ? 'pi_id' : 'sponsor_id';
+      let allRelated: any[] = [];
+      let page = 1;
+      let hasMore = true;
 
-      // Find other files with same PI
-      const relatedByPI = await pb.collection('files').getFullList({
-        filter: `pi_id = "${piId}" && id != "${targetFileId}"`,
-        expand: 'pi_id,sponsor_id',
-      });
+      while (hasMore) {
+        const response = await fetch(
+          `${POCKETBASE_URL}/api/collections/files/records?page=${page}&perPage=500&filter=${filterField}="${targetId}"&expand=pi_id,sponsor_id`,
+          {
+            headers: {
+              'Authorization': `Bearer ${pb.authStore.token}`,
+            },
+          }
+        );
 
-      // Find other files with same Sponsor
-      const relatedBySponsor = await pb.collection('files').getFullList({
-        filter: `sponsor_id = "${sponsorId}" && id != "${targetFileId}"`,
-        expand: 'pi_id,sponsor_id',
-      });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch related proposals: ${response.status}`);
+        }
+
+        const data = await response.json();
+        allRelated = allRelated.concat(data.items || []);
+        hasMore = page < data.totalPages;
+        page++;
+      }
 
       // Format results
-      const related: RelatedProposal[] = [];
-
-      relatedByPI.forEach((file: any) => {
-        related.push({
-          id: file.id,
-          db_no: file.db_no,
-          pi_name: file.expand?.pi_id?.name || '',
-          sponsor_name: file.expand?.sponsor_id?.name || '',
-          status: file.status,
-          relationshipType: 'pi',
-        });
-      });
-
-      relatedBySponsor.forEach((file: any) => {
-        related.push({
-          id: file.id,
-          db_no: file.db_no,
-          pi_name: file.expand?.pi_id?.name || '',
-          sponsor_name: file.expand?.sponsor_id?.name || '',
-          status: file.status,
-          relationshipType: 'sponsor',
-        });
-      });
+      const related: RelatedProposal[] = allRelated.map((file: any) => ({
+        id: file.id,
+        db_no: file.db_no,
+        pi_name: file.pi_name || file.expand?.pi_id?.name || '',
+        sponsor_name: file.sponsor_name || file.expand?.sponsor_id?.name || '',
+        status: file.status,
+        relationshipType: entityType,
+        date_received: file.date_received,
+      })) as any;
 
       setRelatedProposals(related);
     } catch (error) {
       console.error('Error fetching related proposals from PocketBase:', error);
+      setRelatedProposals([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (fileId) {
-      fetchRelatedProposals(fileId);
+    if (entityId) {
+      fetchRelatedProposals(entityId);
+    } else {
+      setRelatedProposals([]);
     }
-  }, [fileId]);
+  }, [entityId, entityType]);
 
-  return { relatedProposals, loading, refetch: fetchRelatedProposals };
+  return { proposals: relatedProposals, loading, refetch: fetchRelatedProposals };
 }

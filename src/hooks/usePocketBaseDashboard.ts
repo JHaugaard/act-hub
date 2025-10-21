@@ -4,14 +4,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { pb } from '@/integrations/pocketbase/client';
+import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
+
+const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
 
 export interface DashboardStats {
-  totalProposals: number;
-  statusBreakdown: Record<string, number>;
-  totalPIs: number;
-  totalSponsors: number;
-  recentProposals: any[];
+  totalFiles: number;
+  statusCounts: Record<string, number>;
 }
 
 export function usePocketBaseDashboard() {
@@ -21,42 +20,53 @@ export function usePocketBaseDashboard() {
   const fetchDashboardStats = async () => {
     setLoading(true);
     try {
-      // Fetch files for dashboard metrics
-      const files = await pb.collection('files').getFullList();
+      // Ensure authenticated before fetching
+      await ensurePocketBaseAuth();
 
-      // Fetch counts for other collections
-      const pisCount = await pb.collection('pis').getFullList();
-      const sponsorsCount = await pb.collection('sponsors').getFullList();
+      // Fetch files using REST API with pagination to handle large result sets
+      let allFiles: any[] = [];
+      let page = 1;
+      let hasMore = true;
+      const pageSize = 500;
 
-      // Calculate status breakdown
-      const statusBreakdown: Record<string, number> = {};
-      files.forEach((file: any) => {
-        statusBreakdown[file.status] = (statusBreakdown[file.status] || 0) + 1;
+      while (hasMore) {
+        const response = await fetch(
+          `${POCKETBASE_URL}/api/collections/files/records?page=${page}&perPage=${pageSize}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${pb.authStore.token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch files: ${response.status}`);
+        }
+
+        const data = await response.json();
+        allFiles = allFiles.concat(data.items || []);
+        hasMore = page < data.totalPages;
+        page++;
+      }
+
+      // Calculate status counts
+      const statusCounts: Record<string, number> = {};
+      allFiles.forEach((file: any) => {
+        statusCounts[file.status] = (statusCounts[file.status] || 0) + 1;
       });
 
-      // Get recent proposals (last 5)
-      const recentProposals = await pb.collection('files').getFullList({
-        sort: '-date_received',
-        limit: 5,
-        expand: 'pi_id,sponsor_id',
-      });
+      console.log(`✅ Dashboard loaded: ${allFiles.length} total files, ${JSON.stringify(statusCounts)}`);
 
       setStats({
-        totalProposals: files.length,
-        statusBreakdown,
-        totalPIs: pisCount.length,
-        totalSponsors: sponsorsCount.length,
-        recentProposals: recentProposals.map((p: any) => ({
-          id: p.id,
-          db_no: p.db_no,
-          pi_name: p.expand?.pi_id?.name || '',
-          sponsor_name: p.expand?.sponsor_id?.name || '',
-          status: p.status,
-          date_received: p.date_received,
-        })),
+        totalFiles: allFiles.length,
+        statusCounts,
       });
     } catch (error) {
       console.error('Error fetching dashboard stats from PocketBase:', error);
+      setStats({
+        totalFiles: 0,
+        statusCounts: {},
+      });
     } finally {
       setLoading(false);
     }

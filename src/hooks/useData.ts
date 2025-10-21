@@ -9,7 +9,7 @@
  * Environment: VITE_DATA_SOURCE = "mock" | "pocketbase" | "supabase"
  */
 
-const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || import.meta.env.VITE_USE_MOCK_DATA === 'true' ? 'mock' : 'supabase';
+const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || (import.meta.env.VITE_USE_MOCK_DATA === 'true' ? 'mock' : 'supabase');
 const USE_MOCK_DATA = DATA_SOURCE === 'mock';
 const USE_POCKETBASE = DATA_SOURCE === 'pocketbase';
 

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { pb } from '@/integrations/pocketbase/client';
+import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
 
 export interface PI {
   id: string;
@@ -23,6 +23,9 @@ export function usePocketBasePIs() {
   const fetchPIs = async () => {
     setLoading(true);
     try {
+      // Ensure authenticated before fetching
+      await ensurePocketBaseAuth();
+
       const records = await pb.collection('pis').getFullList({
         sort: 'name',
       });
@@ -73,6 +76,9 @@ export function usePocketBaseSponsors() {
   const fetchSponsors = async () => {
     setLoading(true);
     try {
+      // Ensure authenticated before fetching
+      await ensurePocketBaseAuth();
+
       const records = await pb.collection('sponsors').getFullList({
         sort: 'name',
       });

@@ -15,10 +15,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AutocompleteInput } from '@/components/ui/autocomplete-input';
-import { usePIs, useSponsors } from '@/hooks/useProposalData';
+import { usePIs, useSponsors } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import type { FileRecord } from '@/hooks/useFiles';
+import type { FileRecord } from '@/hooks/useData';
 
 const proposalFormSchema = z.object({
   db_no: z.string().min(1, 'DB No. is required'),

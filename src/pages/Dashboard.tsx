@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Users, Building2, TrendingUp, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ProposalForm } from '@/components/ProposalForm';
-import { useDashboard } from '@/hooks/useDashboard';
-import { useFiles } from '@/hooks/useFiles';
+import { useDashboard, useFiles } from '@/hooks/useData';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { ProposalsTable } from '@/components/ProposalsTable';
@@ -73,7 +72,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {loading ? '...' : (stats.statusCounts[status] || 0)}
+                {loading ? '...' : (stats?.statusCounts[status] || 0)}
               </div>
               <p className="text-xs text-muted-foreground">
                 proposals

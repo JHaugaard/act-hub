@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, User, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { usePIs } from '@/hooks/useProposalData';
+import { usePIs } from '@/hooks/useData';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';

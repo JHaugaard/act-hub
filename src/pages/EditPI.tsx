@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { PI } from '@/hooks/useProposalData';
+import { PI } from '@/hooks/useData';
 
 const EditPI = () => {
   const { id } = useParams<{ id: string }>();

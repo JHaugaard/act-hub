@@ -39,3 +39,7 @@ bun.lockb
 # Screenshots and docs (optional - remove if you want to commit them)
 Screenshots/
 *.zip
+
+# Playwright
+playwright-report/
+test-results/

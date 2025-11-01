@@ -240,7 +240,7 @@ npm run dev
 
 ### For Production Deployment
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for:
+See [Deployment Guide](deployment.md) for:
 - Self-hosted Supabase setup
 - VPS/Hostinger deployment
 - Environment configuration
@@ -260,7 +260,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for:
 
 ## Repository
 
-- **GitHub:** https://github.com/JHaugaard/proposal-tracker-selfhosted
+- **GitHub:** https://github.com/JHaugaard/act-hub
 - **Branch:** `development` (current)
 - **Main:** Production-ready code (after testing)
 
@@ -269,6 +269,6 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for:
 ## Support
 
 For issues or questions:
-1. Check the [Technical Documentation](Proposal%20Tracker%20-%20Technical%20Documentation.md)
+1. Check the [Technical Overview](technical-overview.md)
 2. Review this guide
 3. Open an issue on GitHub

@@ -176,7 +176,7 @@ Before you start Phase 1, verify:
 
 ```
 ☐ Docker is installed: docker --version
-☐ External drive mounted: ls /Volumes/990-Pro-2TB/development/proposal-tracker/
+☐ External drive mounted: ls /Volumes/dev/development/act-hub/
 ☐ CSV files ready: ls data-for-importing/
 ☐ You're in project directory: pwd (should end in proposal_tracker_2)
 ☐ Node.js installed: npm --version

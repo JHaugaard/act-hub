@@ -9,7 +9,7 @@ This guide walks you through setting up PocketBase locally with Docker on your m
 ## Prerequisites
 
 - Docker and Docker Compose installed on your machine
-- External drive mounted at: `/Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data`
+- External drive mounted at: `/Volumes/dev/development/act-hub/pocketbase-data`
 - Node.js and npm installed
 - CSV data files in `data-for-importing/` directory:
   - `pis.csv`
@@ -219,7 +219,7 @@ npm run dev
 ### View external drive data
 ```bash
 # See what PocketBase stored on external drive
-ls -la /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/
+ls -la /Volumes/dev/development/act-hub/pocketbase-data/
 
 # You'll see:
 # - pb.db (SQLite database file)
@@ -270,7 +270,7 @@ npm run dev
 ls -la data-for-importing/
 
 # View external drive data
-ls -la /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/
+ls -la /Volumes/dev/development/act-hub/pocketbase-data/
 ```
 
 ---

@@ -35,7 +35,7 @@ Welcome! You're about to transition from Lovable's Supabase to a self-hosted Poc
 
 **Files to read:**
 - [PHASE1-QUICKSTART.txt](PHASE1-QUICKSTART.txt) ← Start here (checklist format)
-- [PHASE1-SETUP.md](PHASE1-SETUP.md) ← Detailed walkthrough with troubleshooting
+- [Phase 1 Setup](phase1-setup.md) ← Detailed walkthrough with troubleshooting
 
 **Status:** Infrastructure ready, waiting for you to execute
 
@@ -94,7 +94,7 @@ Welcome! You're about to transition from Lovable's Supabase to a self-hosted Poc
 ```bash
 # You should have:
 ✅ Docker installed (docker --version)
-✅ External drive mounted (ls /Volumes/990-Pro-2TB/development/proposal-tracker/)
+✅ External drive mounted (ls /Volumes/dev/development/act-hub/)
 ✅ Node.js/npm installed (npm --version)
 ✅ .env file with Supabase credentials (cat .env | grep SUPABASE)
 ```
@@ -135,7 +135,7 @@ curl http://localhost:8090/api/health
 # Check browser console: should say "🔧 Data Source: POCKETBASE"
 
 # Data on external drive?
-ls -la /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/
+ls -la /Volumes/dev/development/act-hub/pocketbase-data/
 ```
 
 ---
@@ -259,7 +259,7 @@ If you get stuck:
    - Docker issues? → Run `docker logs` to see what's happening
    - Database issues? → Check admin UI at http://localhost:8091
 3. **Inspect the data:**
-   - View external drive: `ls /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/`
+   - View external drive: `ls /Volumes/dev/development/act-hub/pocketbase-data/`
    - View PocketBase: http://localhost:8091
    - View browser console: Chrome DevTools → Console
 

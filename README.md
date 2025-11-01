@@ -1,4 +1,4 @@
-# Proposal Tracker - Self-Hosted
+# ACT Hub - Activity Tracker Hub
 
 A full-stack research proposal tracking application for managing proposals, principal investigators, sponsors, and related documentation.
 
@@ -22,9 +22,14 @@ Visit [http://localhost:8080](http://localhost:8080)
 
 ## 📚 Documentation
 
-- **[Development Guide](README-DEVELOPMENT.md)** - Setup, mock data, switching modes
-- **[Deployment Guide](DEPLOYMENT.md)** - Self-hosted Supabase, VPS deployment
-- **[Technical Documentation](Proposal%20Tracker%20-%20Technical%20Documentation.md)** - Architecture, features, codebase
+- **[Getting Started](docs/getting-started.md)** - Quick start guide for new developers
+- **[Development Guide](docs/development.md)** - Setup, mock data, switching modes
+- **[Deployment Guide](docs/deployment.md)** - Self-hosted deployment and VPS setup
+- **[Technical Overview](docs/technical-overview.md)** - Architecture, features, codebase
+- **[Migration Summary](docs/migration-summary.md)** - PocketBase migration details
+- **[CSV Import Guide](docs/csv-import.md)** - Data import instructions
+- **[Phase 1 Setup](docs/phase1-setup.md)** - Initial PocketBase setup
+- **[Phase 1 Guide](docs/phase1-guide.md)** - Phase 1 documentation guide
 
 ---
 
@@ -224,9 +229,9 @@ npm run build
 
 ## 📖 Learn More
 
-- [Development Guide](README-DEVELOPMENT.md) - Full development documentation
-- [Deployment Guide](DEPLOYMENT.md) - Production deployment guide
-- [Technical Docs](Proposal%20Tracker%20-%20Technical%20Documentation.md) - Architecture details
+- [Development Guide](docs/development.md) - Full development documentation
+- [Deployment Guide](docs/deployment.md) - Production deployment guide
+- [Technical Overview](docs/technical-overview.md) - Architecture details
 
 ---
 
@@ -238,7 +243,7 @@ This project is for internal use. Contact repository owner for licensing details
 
 ## 🔗 Repository
 
-**GitHub:** [https://github.com/JHaugaard/proposal-tracker-selfhosted](https://github.com/JHaugaard/proposal-tracker-selfhosted)
+**GitHub:** [https://github.com/JHaugaard/act-hub](https://github.com/JHaugaard/act-hub)
 
 **Branches:**
 - `main` - Production-ready code

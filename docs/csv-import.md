@@ -168,7 +168,7 @@ curl http://localhost:8090/api/collections/files/records?expand=pi_id,sponsor_id
 
 ### Check External Drive
 ```bash
-ls -la /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/
+ls -la /Volumes/dev/development/act-hub/pocketbase-data/
 
 # You'll see:
 # pb.db (SQLite database with all data)
@@ -209,7 +209,7 @@ node scripts/setup-pocketbase-schema.js
 
 # If changed, update in import script or reset PocketBase
 docker-compose -f docker-compose.local.yml down
-rm -rf /Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/*
+rm -rf /Volumes/dev/development/act-hub/pocketbase-data/*
 docker-compose -f docker-compose.local.yml up -d
 ```
 

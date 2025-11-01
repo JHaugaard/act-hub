@@ -10,7 +10,7 @@
 - **File:** `docker-compose.local.yml`
 - **What it does:**
   - Runs PocketBase in a Docker container
-  - Stores all data on your external drive: `/Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data`
+  - Stores all data on your external drive: `/Volumes/dev/development/act-hub/pocketbase-data`
   - Exposes API on port `8090`
   - Exposes admin UI on port `8091`
   - Persists data even if container stops/restarts
@@ -77,7 +77,7 @@ Complete React integration with hooks mirroring your Supabase hooks:
 ## Your External Drive Structure
 
 ```
-/Volumes/990-Pro-2TB/development/proposal-tracker/pocketbase-data/
+/Volumes/dev/development/act-hub/pocketbase-data/
 ├── pb.db                    # SQLite database (your actual data)
 ├── pb_public/               # Public files directory
 └── migrations/              # PocketBase migrations
@@ -171,7 +171,7 @@ You have everything needed! Here's what to do next:
 ### Immediate (Next 30 mins):
 1. Verify external drive path is accessible
    ```bash
-   ls /Volumes/990-Pro-2TB/development/proposal-tracker/
+   ls /Volumes/dev/development/act-hub/
    ```
 
 2. Start PocketBase

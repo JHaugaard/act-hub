@@ -110,8 +110,8 @@ psql [self-hosted-db-url] < lovable-export.sql
 2. **Clone Repository**
    ```bash
    cd /var/www
-   git clone https://github.com/JHaugaard/proposal-tracker-selfhosted.git
-   cd proposal-tracker-selfhosted
+   git clone https://github.com/JHaugaard/act-hub.git
+   cd act-hub
    git checkout main  # or production branch
    ```
 
@@ -139,7 +139,7 @@ psql [self-hosted-db-url] < lovable-export.sql
 
 6. **Configure Nginx**
    ```bash
-   sudo nano /etc/nginx/sites-available/proposal-tracker
+   sudo nano /etc/nginx/sites-available/act-hub
    ```
 
    ```nginx
@@ -147,7 +147,7 @@ psql [self-hosted-db-url] < lovable-export.sql
        listen 80;
        server_name your-domain.com;
 
-       root /var/www/proposal-tracker-selfhosted/dist;
+       root /var/www/act-hub/dist;
        index index.html;
 
        location / {
@@ -162,7 +162,7 @@ psql [self-hosted-db-url] < lovable-export.sql
 
 7. **Enable Site**
    ```bash
-   sudo ln -s /etc/nginx/sites-available/proposal-tracker /etc/nginx/sites-enabled/
+   sudo ln -s /etc/nginx/sites-available/act-hub /etc/nginx/sites-enabled/
    sudo nginx -t
    sudo systemctl restart nginx
    ```
@@ -210,7 +210,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY="your-anon-key"
 
    ```bash
    #!/bin/bash
-   cd /var/www/proposal-tracker-selfhosted
+   cd /var/www/act-hub
    git pull origin main
    npm install
    npm run build
@@ -265,7 +265,7 @@ crontab -e
 
 ```bash
 # On VPS
-cd /var/www/proposal-tracker-selfhosted
+cd /var/www/act-hub
 git pull origin main
 npm install
 npm run build
@@ -360,6 +360,6 @@ npm run build
 
 For deployment assistance:
 1. Review this guide thoroughly
-2. Check [README-DEVELOPMENT.md](README-DEVELOPMENT.md)
+2. Check [Development Guide](development.md)
 3. Consult technical documentation
 4. Open GitHub issue if needed

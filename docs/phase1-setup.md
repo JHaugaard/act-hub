@@ -1,4 +1,4 @@
-# Phase 1: Local PocketBase Setup Guide
+# Phase 1: Local PocketBase Setup Guide - ACT Hub
 
 This guide walks you through setting up PocketBase locally with Docker on your machine, importing all data from your production CSV files, and testing the application locally.
 

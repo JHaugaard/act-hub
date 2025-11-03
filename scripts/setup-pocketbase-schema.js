@@ -75,8 +75,9 @@ async function setupSchema() {
 
     // Create PIs collection
     console.log('📝 Creating PIs collection...');
+    let pisCollection;
     try {
-      await pb.collections.create({
+      pisCollection = await pb.collections.create({
         name: 'pis',
         type: 'base',
         schema: [
@@ -91,6 +92,9 @@ async function setupSchema() {
     } catch (error) {
       if (error.message.includes('already exists')) {
         console.log('⚠️  PIs collection already exists\n');
+        // Fetch existing collection
+        const collections = await pb.collections.getFullList();
+        pisCollection = collections.find(c => c.name === 'pis');
       } else {
         throw error;
       }
@@ -98,8 +102,9 @@ async function setupSchema() {
 
     // Create Sponsors collection
     console.log('📝 Creating Sponsors collection...');
+    let sponsorsCollection;
     try {
-      await pb.collections.create({
+      sponsorsCollection = await pb.collections.create({
         name: 'sponsors',
         type: 'base',
         schema: [
@@ -114,6 +119,9 @@ async function setupSchema() {
     } catch (error) {
       if (error.message.includes('already exists')) {
         console.log('⚠️  Sponsors collection already exists\n');
+        // Fetch existing collection
+        const collections = await pb.collections.getFullList();
+        sponsorsCollection = collections.find(c => c.name === 'sponsors');
       } else {
         throw error;
       }
@@ -121,8 +129,9 @@ async function setupSchema() {
 
     // Create Files collection (Proposals)
     console.log('📝 Creating Files (Proposals) collection...');
+    let filesCollection;
     try {
-      await pb.collections.create({
+      filesCollection = await pb.collections.create({
         name: 'files',
         type: 'base',
         schema: [
@@ -136,6 +145,7 @@ async function setupSchema() {
             type: 'select',
             required: true,
             options: {
+              maxSelect: 1,
               values: [
                 'In',
                 'Pending',
@@ -176,8 +186,10 @@ async function setupSchema() {
             type: 'relation',
             required: true,
             options: {
-              collectionId: 'pis',
+              collectionId: pisCollection.id,
               cascadeDelete: false,
+              maxSelect: 1,
+              minSelect: 1,
             },
           },
           {
@@ -185,8 +197,10 @@ async function setupSchema() {
             type: 'relation',
             required: true,
             options: {
-              collectionId: 'sponsors',
+              collectionId: sponsorsCollection.id,
               cascadeDelete: false,
+              maxSelect: 1,
+              minSelect: 1,
             },
           },
         ],
@@ -195,7 +209,11 @@ async function setupSchema() {
     } catch (error) {
       if (error.message.includes('already exists')) {
         console.log('⚠️  Files collection already exists\n');
+        // Fetch existing collection
+        const collections = await pb.collections.getFullList();
+        filesCollection = collections.find(c => c.name === 'files');
       } else {
+        console.error('Detailed error:', JSON.stringify(error.response, null, 2));
         throw error;
       }
     }
@@ -212,8 +230,10 @@ async function setupSchema() {
             type: 'relation',
             required: true,
             options: {
-              collectionId: 'files',
+              collectionId: filesCollection.id,
               cascadeDelete: true,
+              maxSelect: 1,
+              minSelect: 1,
             },
           },
           {

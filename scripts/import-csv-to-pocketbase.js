@@ -183,8 +183,6 @@ async function importData() {
           status: status,
           pi_id: piId,
           sponsor_id: sponsorId,
-          pi_name: piName,
-          sponsor_name: sponsorName,
           cayuse: sanitizeValue(record.cayuse),
           date_received: parseDate(record.date_received),
           date_status_change: parseDate(record.date_status_change),
@@ -208,7 +206,7 @@ async function importData() {
     console.log(`   - Files: ${fileCount}`);
     console.log(`   - Skipped: ${skippedCount}\n`);
     console.log('Next steps:');
-    console.log('1. Verify data in PocketBase admin panel: http://localhost:8091');
+    console.log('1. Verify data in PocketBase admin panel: http://localhost:8090/_/');
     console.log('2. Update your .env: VITE_DATA_SOURCE="pocketbase"');
     console.log('3. Restart dev server: npm run dev\n');
 

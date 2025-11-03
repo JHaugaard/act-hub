@@ -1,4 +1,4 @@
-# ACT Hub - Activity Tracker Hub
+# ACT Hub - Award Contracting Team Hub
 
 A full-stack research proposal tracking application for managing proposals, principal investigators, sponsors, and related documentation.
 

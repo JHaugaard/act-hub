@@ -24,7 +24,7 @@ The next time you work on the app, you'll see all 1,125+ proposals from your act
 docker-compose -f docker-compose.local.yml up -d
 ```
 
-The data will persist between restarts since it's stored in the `/Volumes/dev/development/act-hub/pocketbase-data` directory on your Mac.
+The data will persist between restarts since it's stored in the `/Volumes/dev/develop/act-hub/pocketbase-data` directory on your Mac.
 
 ## Session Summary Highlights
 

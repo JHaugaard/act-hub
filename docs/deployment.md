@@ -301,7 +301,7 @@ If your local PocketBase has the data you want:
 ```bash
 # On your local machine:
 # Copy the SQLite database file to VPS
-scp /Volumes/dev/development/act-hub/pocketbase-data/pb.db \
+scp /Volumes/dev/develop/act-hub/pocketbase-data/pb.db \
     deployer@your-vps-ip:/tmp/pb.db
 
 # On VPS:

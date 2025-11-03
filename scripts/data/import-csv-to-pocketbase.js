@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const POCKETBASE_URL = process.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
-const DATA_DIR = join(__dirname, '../data-for-importing');
+const DATA_DIR = join(__dirname, '../../data-for-importing');
 
 // CSV file paths
 const CSV_FILES = {

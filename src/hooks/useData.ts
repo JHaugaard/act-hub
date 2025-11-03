@@ -15,26 +15,26 @@ const USE_POCKETBASE = DATA_SOURCE === 'pocketbase';
 
 console.log(`🔧 Data Source: ${DATA_SOURCE.toUpperCase()}`);
 
-// Real Supabase hooks
-import { useFiles as useRealFiles } from './useFiles';
-import { usePIs as useRealPIs, useSponsors as useRealSponsors } from './useProposalData';
-import { useDashboard as useRealDashboard } from './useDashboard';
-import { useRelatedProposals as useRealRelatedProposals } from './useRelatedProposals';
-import { useFileAttachments as useRealFileAttachments } from './useFileAttachments';
+// Supabase hooks (legacy)
+import { useFiles as useRealFiles } from './data/supabase/useFiles';
+import { usePIs as useRealPIs, useSponsors as useRealSponsors } from './data/supabase/useProposalData';
+import { useDashboard as useRealDashboard } from './data/supabase/useDashboard';
+import { useRelatedProposals as useRealRelatedProposals } from './data/supabase/useRelatedProposals';
+import { useFileAttachments as useRealFileAttachments } from './data/supabase/useFileAttachments';
 
-// PocketBase hooks
-import { usePocketBaseFiles } from './usePocketBaseFiles';
-import { usePocketBasePIs, usePocketBaseSponsors } from './usePocketBaseProposalData';
-import { usePocketBaseDashboard } from './usePocketBaseDashboard';
-import { usePocketBaseRelatedProposals } from './usePocketBaseRelatedProposals';
-import { usePocketBaseFileAttachments } from './usePocketBaseFileAttachments';
+// PocketBase hooks (current production)
+import { usePocketBaseFiles } from './data/pocketbase/usePocketBaseFiles';
+import { usePocketBasePIs, usePocketBaseSponsors } from './data/pocketbase/usePocketBaseProposalData';
+import { usePocketBaseDashboard } from './data/pocketbase/usePocketBaseDashboard';
+import { usePocketBaseRelatedProposals } from './data/pocketbase/usePocketBaseRelatedProposals';
+import { usePocketBaseFileAttachments } from './data/pocketbase/usePocketBaseFileAttachments';
 
-// Mock hooks
-import { useMockFiles } from './mock/useMockFiles';
-import { useMockPIs, useMockSponsors } from './mock/useMockProposalData';
-import { useMockDashboard } from './mock/useMockDashboard';
-import { useMockRelatedProposals } from './mock/useMockRelatedProposals';
-import { useMockFileAttachments } from './mock/useMockFileAttachments';
+// Mock hooks (development/testing)
+import { useMockFiles } from './data/mock/useMockFiles';
+import { useMockPIs, useMockSponsors } from './data/mock/useMockProposalData';
+import { useMockDashboard } from './data/mock/useMockDashboard';
+import { useMockRelatedProposals } from './data/mock/useMockRelatedProposals';
+import { useMockFileAttachments } from './data/mock/useMockFileAttachments';
 
 // Initialize mock data if using mock mode
 if (USE_MOCK_DATA) {
@@ -81,5 +81,5 @@ export const useFileAttachments = USE_MOCK_DATA
     : useRealFileAttachments;
 
 // Also export types for convenience
-export type { FileRecord, SortField, SortDirection } from './useFiles';
-export type { PI, Sponsor } from './useProposalData';
+export type { FileRecord, SortField, SortDirection } from './data/supabase/useFiles';
+export type { PI, Sponsor } from './data/supabase/useProposalData';

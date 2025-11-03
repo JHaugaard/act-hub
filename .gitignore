@@ -21,7 +21,7 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
+**/.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
@@ -32,14 +32,24 @@ dist-ssr
 bun.lockb
 
 # MacOS
-.DS_Store
+**/.DS_Store
 .AppleDouble
 .LSOverride
+._*
 
-# Screenshots and docs (optional - remove if you want to commit them)
+# Screenshots and temporary files
 Screenshots/
 *.zip
 
-# Playwright
+# Playwright (test artifacts)
 playwright-report/
 test-results/
+*.last-run.json
+
+# PocketBase data (local development)
+pocketbase-data/
+
+# Temporary files
+*.tmp
+*.temp
+*~

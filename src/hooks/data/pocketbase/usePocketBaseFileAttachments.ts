@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 
 export interface FileAttachment {
   id: string;

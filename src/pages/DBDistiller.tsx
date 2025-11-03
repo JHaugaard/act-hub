@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Printer, RotateCcw } from 'lucide-react';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 
 import { FileUpload } from '@/components/distiller/FileUpload';
 import { StatusFilter } from '@/components/distiller/StatusFilter';
 import { DataTable } from '@/components/distiller/DataTable';
-import { useDistillerTimeout } from '@/hooks/useDistillerTimeout';
+import { useDistillerTimeout } from '@/hooks/features/useDistillerTimeout';
 
 import { processExcelFile, ProcessedData, ProposalRecord } from '@/utils/distiller/spreadsheetProcessor';
 import { filterRecords, getUniqueStatuses, getStatusColorForPrint } from '@/utils/distiller/spreadsheetFilter';

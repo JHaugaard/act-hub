@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { RelatedProposalsPopover } from '@/components/RelatedProposalsPopover';
 import { SearchBar } from '@/components/SearchBar';
 import { ScrollArea } from '@/components/ui/scroll-area';

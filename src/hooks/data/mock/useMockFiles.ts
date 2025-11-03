@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { mockStorage, STORAGE_KEYS } from '@/lib/mockStorage';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import type { FileRecord, SortField, SortDirection } from '@/hooks/useFiles';
 
 export function useMockFiles() {

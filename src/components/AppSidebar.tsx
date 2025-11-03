@@ -1,6 +1,6 @@
 import { FileText, Users, Building2, Database, User, Edit, Key, LogOut, Zap } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '@/components/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 import {
@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { useState } from 'react';
 
 const navigationItems = [

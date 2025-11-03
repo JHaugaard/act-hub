@@ -11,7 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { ArrowLeft, Trash2, ExternalLink, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { type FileRecord, usePIs, useSponsors } from '@/hooks/useData';
 import { FileAttachmentsManager } from '@/components/FileAttachmentsManager';
 import { RelatedProposalsPopover } from '@/components/RelatedProposalsPopover';

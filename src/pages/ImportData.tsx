@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useDataImport } from '@/hooks/useDataImport';
+import { useDataImport } from '@/hooks/features/useDataImport';
 import { Upload, CheckCircle, AlertCircle, FileText, Users, Building } from 'lucide-react';
 
 const ImportData = () => {

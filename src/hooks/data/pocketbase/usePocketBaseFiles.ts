@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 
 const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
 

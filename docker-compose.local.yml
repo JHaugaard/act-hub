@@ -13,7 +13,7 @@ services:
     environment:
       - POCKETBASE_SUPERUSER_EMAIL=admin@local.test
       - POCKETBASE_SUPERUSER_PASSWORD=admin123456
-    command: [ "/usr/local/bin/pocketbase", "serve", "--http=0.0.0.0:8090", "--migrationsDir=/pb_data/migrations" ]
+    command: [ "/usr/local/bin/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb_data", "--migrationsDir=/pb_data/migrations" ]
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8090/api/health" ]

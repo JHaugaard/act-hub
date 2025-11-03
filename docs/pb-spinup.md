@@ -41,7 +41,7 @@ docker compose version
 
 ```bash
 # Create the directory specified in docker-compose.local.yml
-mkdir -p /Volumes/dev/development/act-hub/pocketbase-data
+mkdir -p /Volumes/dev/develop/act-hub/pocketbase-data
 ```
 
 ### Step 3: Start PocketBase Container

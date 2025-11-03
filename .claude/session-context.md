@@ -191,7 +191,7 @@ Successfully set up PocketBase local development environment with Docker, create
 - **Ports:**
   - 8090:8090 (API + Admin UI)
   - 8091:8091 (mapped but not used by PocketBase)
-- **Volume:** `/Volumes/dev/development/act-hub/pocketbase-data:/pb_data`
+- **Volume:** `/Volumes/dev/develop/act-hub/pocketbase-data:/pb_data`
 - **Data Persistence:** All data stored in external volume (survives container restart)
 
 ### Environment Variables

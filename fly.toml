@@ -1,0 +1,29 @@
+# fly.toml - Frontend application configuration
+# Deploy with: fly deploy
+
+app = "proposaltracker-web"
+primary_region = "sjc"  # San Jose - change to your preferred region
+
+[build]
+  dockerfile = "Dockerfile"
+
+[build.args]
+  VITE_DATA_SOURCE = "pocketbase"
+  VITE_POCKETBASE_URL = "https://proposaltracker-api.fly.dev"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/"

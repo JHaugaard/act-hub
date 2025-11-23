@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
+import { pb } from '@/integrations/pocketbase/client';
 
 export interface RelatedProposal {
   id: string;
@@ -24,9 +24,6 @@ export function usePocketBaseRelatedProposals(entityId?: string | null, entityTy
 
     setLoading(true);
     try {
-      // Ensure authenticated before fetching
-      await ensurePocketBaseAuth();
-
       const targetId = id || entityId;
       const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
 

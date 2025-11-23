@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+
+# Build output (we build inside container)
+dist
+
+# Git
+.git
+.gitignore
+
+# Environment files (secrets)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+._*
+
+# Local development data
+pocketbase-data
+data-for-importing
+
+# Test artifacts
+playwright-report
+test-results
+
+# Documentation (not needed in container)
+docs
+Screenshots
+*.md
+!README.md
+
+# Claude/AI files
+.claude
+
+# Misc
+*.log
+*.tmp

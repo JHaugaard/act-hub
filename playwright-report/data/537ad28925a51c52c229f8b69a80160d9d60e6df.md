@@ -1,0 +1,86 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e4]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]: Proposal Tracker
+        - button "Toggle Sidebar" [ref=e13] [cursor=pointer]:
+          - img
+          - generic [ref=e14] [cursor=pointer]: Toggle Sidebar
+      - button "Account dev@example.com" [ref=e16] [cursor=pointer]:
+        - img
+        - generic [ref=e17] [cursor=pointer]:
+          - generic [ref=e18] [cursor=pointer]: Account
+          - generic [ref=e19] [cursor=pointer]: dev@example.com
+      - list [ref=e21]:
+        - listitem [ref=e22]:
+          - link "Dashboard" [ref=e23] [cursor=pointer]:
+            - /url: /
+            - img [ref=e24] [cursor=pointer]
+            - generic [ref=e28] [cursor=pointer]: Dashboard
+        - listitem [ref=e29]:
+          - link "Proposals" [ref=e30] [cursor=pointer]:
+            - /url: /proposals
+            - img [ref=e31] [cursor=pointer]
+            - generic [ref=e34] [cursor=pointer]: Proposals
+        - listitem [ref=e35]:
+          - link "PIs" [ref=e36] [cursor=pointer]:
+            - /url: /pis
+            - img [ref=e37] [cursor=pointer]
+            - generic [ref=e42] [cursor=pointer]: PIs
+        - listitem [ref=e43]:
+          - link "Sponsors" [ref=e44] [cursor=pointer]:
+            - /url: /sponsors
+            - img [ref=e45] [cursor=pointer]
+            - generic [ref=e49] [cursor=pointer]: Sponsors
+        - listitem [ref=e50]:
+          - link "DB Distiller" [ref=e51] [cursor=pointer]:
+            - /url: /distiller
+            - img [ref=e52] [cursor=pointer]
+            - generic [ref=e54] [cursor=pointer]: DB Distiller
+    - generic [ref=e55]:
+      - banner [ref=e56]:
+        - heading "Proposal Tracker" [level=1] [ref=e58]
+      - main [ref=e59]:
+        - generic [ref=e60]:
+          - generic [ref=e61]:
+            - heading "Dashboard" [level=1] [ref=e62]
+            - paragraph [ref=e63]: Overview of Proposals
+          - generic [ref=e64]:
+            - generic [ref=e65] [cursor=pointer]:
+              - generic [ref=e66] [cursor=pointer]:
+                - heading "In" [level=3] [ref=e67] [cursor=pointer]
+                - img [ref=e68] [cursor=pointer]
+              - generic [ref=e71] [cursor=pointer]:
+                - generic [ref=e72] [cursor=pointer]: "0"
+                - paragraph [ref=e73] [cursor=pointer]: proposals
+            - generic [ref=e74] [cursor=pointer]:
+              - generic [ref=e75] [cursor=pointer]:
+                - heading "Pending" [level=3] [ref=e76] [cursor=pointer]
+                - img [ref=e77] [cursor=pointer]
+              - generic [ref=e80] [cursor=pointer]:
+                - generic [ref=e81] [cursor=pointer]: "0"
+                - paragraph [ref=e82] [cursor=pointer]: proposals
+            - generic [ref=e83] [cursor=pointer]:
+              - generic [ref=e84] [cursor=pointer]:
+                - heading "Pending Signatures" [level=3] [ref=e85] [cursor=pointer]
+                - img [ref=e86] [cursor=pointer]
+              - generic [ref=e91] [cursor=pointer]:
+                - generic [ref=e92] [cursor=pointer]: "0"
+                - paragraph [ref=e93] [cursor=pointer]: proposals
+            - generic [ref=e94] [cursor=pointer]:
+              - generic [ref=e95] [cursor=pointer]:
+                - heading "Process" [level=3] [ref=e96] [cursor=pointer]
+                - img [ref=e97] [cursor=pointer]
+              - generic [ref=e101] [cursor=pointer]:
+                - generic [ref=e102] [cursor=pointer]: "0"
+                - paragraph [ref=e103] [cursor=pointer]: proposals
+          - button "Add Proposal" [ref=e105] [cursor=pointer]:
+            - img
+            - text: Add Proposal
+```

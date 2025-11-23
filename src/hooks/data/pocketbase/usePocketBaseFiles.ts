@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
+import { pb } from '@/integrations/pocketbase/client';
 import { useToast } from '@/hooks/ui/use-toast';
 
 const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
@@ -42,9 +42,6 @@ export function usePocketBaseFiles() {
   const fetchFiles = async () => {
     setLoading(true);
     try {
-      // Ensure authenticated before fetching
-      await ensurePocketBaseAuth();
-
       // Fetch files using REST API with pagination to handle large result sets
       let allRecords: any[] = [];
       let page = 1;

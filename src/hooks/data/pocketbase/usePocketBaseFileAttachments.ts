@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { pb, ensurePocketBaseAuth } from '@/integrations/pocketbase/client';
+import { pb } from '@/integrations/pocketbase/client';
 import { useToast } from '@/hooks/ui/use-toast';
 
 export interface FileAttachment {
@@ -26,9 +26,6 @@ export function usePocketBaseFileAttachments(fileId?: string) {
 
     setLoading(true);
     try {
-      // Ensure authenticated before fetching
-      await ensurePocketBaseAuth();
-
       const targetFileId = id || fileId;
       const records = await pb.collection('file_attachments').getFullList({
         filter: `file_id = "${targetFileId}"`,
@@ -57,9 +54,6 @@ export function usePocketBaseFileAttachments(fileId?: string) {
     file: File
   ): Promise<FileAttachment | null> => {
     try {
-      // Ensure authenticated before uploading
-      await ensurePocketBaseAuth();
-
       const formData = new FormData();
       formData.append('file_id', targetFileId);
       formData.append('filename', file.name);
@@ -99,9 +93,6 @@ export function usePocketBaseFileAttachments(fileId?: string) {
 
   const deleteAttachment = async (attachmentId: string): Promise<boolean> => {
     try {
-      // Ensure authenticated before deleting
-      await ensurePocketBaseAuth();
-
       await pb.collection('file_attachments').delete(attachmentId);
 
       setAttachments(prev => prev.filter(a => a.id !== attachmentId));

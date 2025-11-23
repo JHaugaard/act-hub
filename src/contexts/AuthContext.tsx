@@ -1,16 +1,25 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { pb } from '@/integrations/pocketbase/client';
+import type { RecordModel } from 'pocketbase';
+
+// User type based on PocketBase's users collection
+interface PocketBaseUser {
+  id: string;
+  email: string;
+  name?: string;
+  avatar?: string;
+  created: string;
+  updated: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: PocketBaseUser | null;
+  isAuthenticated: boolean;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
-  updatePassword: (newPassword: string) => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,88 +32,103 @@ export const useAuth = () => {
   return context;
 };
 
+// Helper to convert PocketBase model to our user type
+function modelToUser(model: RecordModel | null): PocketBaseUser | null {
+  if (!model) return null;
+  return {
+    id: model.id,
+    email: model.email,
+    name: model.name,
+    avatar: model.avatar,
+    created: model.created,
+    updated: model.updated,
+  };
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // TEMPORARY: Mock user for development - remove when implementing real auth
-  const mockUser = {
-    id: 'dev-user-123',
-    email: 'dev@example.com',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    app_metadata: {},
-    user_metadata: {},
-    aud: 'authenticated',
-    role: 'authenticated'
-  } as User;
-
-  const mockSession = {
-    access_token: 'mock-token',
-    refresh_token: 'mock-refresh',
-    expires_in: 3600,
-    expires_at: Date.now() + 3600000,
-    token_type: 'bearer',
-    user: mockUser
-  } as Session;
-
-  const [user, setUser] = useState<User | null>(mockUser);
-  const [session, setSession] = useState<Session | null>(mockSession);
-  const [loading, setLoading] = useState(false); // No loading needed for mock data
+  const [user, setUser] = useState<PocketBaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TEMPORARY: Disabled for development
-    // Uncomment this section when re-enabling authentication:
-    /*
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    // Check if user is already authenticated (from localStorage)
+    const initAuth = () => {
+      if (pb.authStore.isValid && pb.authStore.model) {
+        setUser(modelToUser(pb.authStore.model));
       }
-    );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
       setLoading(false);
+    };
+
+    initAuth();
+
+    // Subscribe to auth state changes
+    const unsubscribe = pb.authStore.onChange((token, model) => {
+      setUser(modelToUser(model));
     });
 
-    return () => subscription.unsubscribe();
-    */
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  // TEMPORARY: Mock auth functions for development
-  const signUp = async (email: string, password: string) => {
-    console.log('Mock signUp called - disabled for development');
-    return { error: null };
+  const signUp = async (email: string, password: string, name?: string): Promise<{ error: Error | null }> => {
+    try {
+      // Create the user
+      await pb.collection('users').create({
+        email,
+        password,
+        passwordConfirm: password,
+        name: name || email.split('@')[0], // Use email prefix as default name
+      });
+
+      // Auto sign-in after registration
+      await pb.collection('users').authWithPassword(email, password);
+
+      return { error: null };
+    } catch (err: any) {
+      console.error('Sign up error:', err);
+      return {
+        error: new Error(err?.message || 'Failed to create account')
+      };
+    }
   };
 
-  const signIn = async (email: string, password: string) => {
-    console.log('Mock signIn called - disabled for development');
-    return { error: null };
+  const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
+    try {
+      await pb.collection('users').authWithPassword(email, password);
+      return { error: null };
+    } catch (err: any) {
+      console.error('Sign in error:', err);
+      return {
+        error: new Error(err?.message || 'Invalid email or password')
+      };
+    }
   };
 
-  const signOut = async () => {
-    console.log('Mock signOut called - disabled for development');
+  const signOut = async (): Promise<void> => {
+    pb.authStore.clear();
+    setUser(null);
   };
 
-  const resetPassword = async (email: string) => {
-    console.log('Mock resetPassword called - disabled for development');
-    return { error: null };
+  const resetPassword = async (email: string): Promise<{ error: Error | null }> => {
+    try {
+      await pb.collection('users').requestPasswordReset(email);
+      return { error: null };
+    } catch (err: any) {
+      console.error('Password reset error:', err);
+      return {
+        error: new Error(err?.message || 'Failed to send password reset email')
+      };
+    }
   };
 
-  const updatePassword = async (newPassword: string) => {
-    console.log('Mock updatePassword called - disabled for development');
-    return { error: null };
-  };
-
-  const value = {
+  const value: AuthContextType = {
     user,
-    session,
+    isAuthenticated: !!user,
     loading,
     signUp,
     signIn,
     signOut,
     resetPassword,
-    updatePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

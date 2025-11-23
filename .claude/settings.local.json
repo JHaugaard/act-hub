@@ -37,7 +37,8 @@
       "Bash(node scripts/data/import-csv-to-pocketbase.js:*)",
       "Bash(docker restart:*)",
       "Bash(node scripts/setup/setup-pocketbase-schema.js:*)",
-      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjM0MDE2NTgsImlkIjoiZXl3ZnJpdjM4cTN6cjFpIiwidHlwZSI6ImFkbWluIn0.plgpafmWGCYax9zMTjr9HZGRAyym9_z02ThZYzAUb5I\")"
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjM0MDE2NTgsImlkIjoiZXl3ZnJpdjM4cTN6cjFpIiwidHlwZSI6ImFkbWluIn0.plgpafmWGCYax9zMTjr9HZGRAyym9_z02ThZYzAUb5I\")",
+      "Bash(docker ps:*)"
     ],
     "deny": [],
     "ask": []

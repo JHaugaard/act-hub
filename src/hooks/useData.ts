@@ -21,6 +21,7 @@ import { usePIs as useRealPIs, useSponsors as useRealSponsors } from './data/sup
 import { useDashboard as useRealDashboard } from './data/supabase/useDashboard';
 import { useRelatedProposals as useRealRelatedProposals } from './data/supabase/useRelatedProposals';
 import { useFileAttachments as useRealFileAttachments } from './data/supabase/useFileAttachments';
+import { useSupabaseFileDetail } from './data/supabase/useFileDetail';
 
 // PocketBase hooks (current production)
 import { usePocketBaseFiles } from './data/pocketbase/usePocketBaseFiles';
@@ -28,6 +29,7 @@ import { usePocketBasePIs, usePocketBaseSponsors } from './data/pocketbase/usePo
 import { usePocketBaseDashboard } from './data/pocketbase/usePocketBaseDashboard';
 import { usePocketBaseRelatedProposals } from './data/pocketbase/usePocketBaseRelatedProposals';
 import { usePocketBaseFileAttachments } from './data/pocketbase/usePocketBaseFileAttachments';
+import { usePocketBaseFileDetail } from './data/pocketbase/usePocketBaseFileDetail';
 
 // Mock hooks (development/testing)
 import { useMockFiles } from './data/mock/useMockFiles';
@@ -35,6 +37,7 @@ import { useMockPIs, useMockSponsors } from './data/mock/useMockProposalData';
 import { useMockDashboard } from './data/mock/useMockDashboard';
 import { useMockRelatedProposals } from './data/mock/useMockRelatedProposals';
 import { useMockFileAttachments } from './data/mock/useMockFileAttachments';
+import { useMockFileDetail } from './data/mock/useMockFileDetail';
 
 // Initialize mock data if using mock mode
 if (USE_MOCK_DATA) {
@@ -80,6 +83,13 @@ export const useFileAttachments = USE_MOCK_DATA
     ? usePocketBaseFileAttachments
     : useRealFileAttachments;
 
+export const useFileDetail = USE_MOCK_DATA
+  ? useMockFileDetail
+  : USE_POCKETBASE
+    ? usePocketBaseFileDetail
+    : useSupabaseFileDetail;
+
 // Also export types for convenience
 export type { FileRecord, SortField, SortDirection } from './data/supabase/useFiles';
 export type { PI, Sponsor } from './data/supabase/useProposalData';
+export type { FileDetailRecord } from './data/supabase/useFileDetail';

@@ -16,9 +16,16 @@ export interface FileAttachment {
   uploaded_at: string;
 }
 
-export function usePocketBaseFileAttachments(fileId?: string) {
+export interface UploadProgress {
+  fileName: string;
+  progress: number;
+  status: 'uploading' | 'success' | 'error';
+}
+
+export function usePocketBaseFileAttachments(fileId?: string | null) {
   const [attachments, setAttachments] = useState<FileAttachment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const { toast } = useToast();
 
   const fetchAttachments = async (id?: string) => {
@@ -49,15 +56,26 @@ export function usePocketBaseFileAttachments(fileId?: string) {
     }
   };
 
-  const uploadAttachment = async (
-    targetFileId: string,
-    file: File
-  ): Promise<FileAttachment | null> => {
+  const uploadFile = async (file: File): Promise<boolean> => {
+    if (!fileId) return false;
+
+    // Add to progress tracking
+    setUploadProgress(prev => [...prev, {
+      fileName: file.name,
+      progress: 0,
+      status: 'uploading',
+    }]);
+
     try {
       const formData = new FormData();
-      formData.append('file_id', targetFileId);
+      formData.append('file_id', fileId);
       formData.append('filename', file.name);
       formData.append('file_size', file.size.toString());
+
+      // Update progress to 50% (simulated - PocketBase doesn't provide progress)
+      setUploadProgress(prev => prev.map(p =>
+        p.fileName === file.name ? { ...p, progress: 50 } : p
+      ));
 
       // Note: PocketBase file field handling differs from Supabase
       // File will be stored in pb_public directory by PocketBase
@@ -74,20 +92,63 @@ export function usePocketBaseFileAttachments(fileId?: string) {
 
       setAttachments(prev => [newAttachment, ...prev]);
 
+      // Mark as success
+      setUploadProgress(prev => prev.map(p =>
+        p.fileName === file.name ? { ...p, progress: 100, status: 'success' } : p
+      ));
+
+      // Remove from progress after delay
+      setTimeout(() => {
+        setUploadProgress(prev => prev.filter(p => p.fileName !== file.name));
+      }, 2000);
+
       toast({
         title: "Success",
         description: `File ${file.name} uploaded successfully.`,
       });
 
-      return newAttachment;
+      return true;
     } catch (error) {
       console.error('Error uploading attachment to PocketBase:', error);
+
+      // Mark as error
+      setUploadProgress(prev => prev.map(p =>
+        p.fileName === file.name ? { ...p, status: 'error' } : p
+      ));
+
+      // Remove from progress after delay
+      setTimeout(() => {
+        setUploadProgress(prev => prev.filter(p => p.fileName !== file.name));
+      }, 3000);
+
       toast({
         title: "Error",
         description: "Failed to upload file. Please try again.",
         variant: "destructive",
       });
-      return null;
+      return false;
+    }
+  };
+
+  const downloadFile = async (attachment: FileAttachment) => {
+    try {
+      // For PocketBase, we need to construct the file URL
+      // This is a placeholder - actual implementation depends on how files are stored
+      const url = attachment.file_path;
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download file. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -123,7 +184,9 @@ export function usePocketBaseFileAttachments(fileId?: string) {
   return {
     attachments,
     loading,
-    uploadAttachment,
+    uploadProgress,
+    uploadFile,
+    downloadFile,
     deleteAttachment,
     refetch: fetchAttachments,
   };

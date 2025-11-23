@@ -11,9 +11,16 @@ interface FileAttachment {
   uploaded_at: string;
 }
 
+interface UploadProgress {
+  fileName: string;
+  progress: number;
+  status: 'uploading' | 'success' | 'error';
+}
+
 export function useMockFileAttachments(fileId: string | null) {
   const [attachments, setAttachments] = useState<FileAttachment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const { toast } = useToast();
 
   const fetchAttachments = async () => {
@@ -135,9 +142,10 @@ export function useMockFileAttachments(fileId: string | null) {
   return {
     attachments,
     loading,
+    uploadProgress,
     uploadFile,
     downloadFile,
-    deleteFile,
+    deleteAttachment: deleteFile,
     refetch: fetchAttachments,
   };
 }

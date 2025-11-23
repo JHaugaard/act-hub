@@ -10,9 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { ArrowLeft, Trash2, ExternalLink, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/ui/use-toast';
-import { type FileRecord, usePIs, useSponsors } from '@/hooks/useData';
+import { usePIs, useSponsors, useFileDetail } from '@/hooks/useData';
 import { FileAttachmentsManager } from '@/components/FileAttachmentsManager';
 import { RelatedProposalsPopover } from '@/components/RelatedProposalsPopover';
 import { AutocompleteInput } from '@/components/ui/autocomplete-input';
@@ -40,10 +38,22 @@ const getStatusColor = (status: string) => {
 export default function FileDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [file, setFile] = useState<FileRecord | null>(null);
-  const [loading, setLoading] = useState(true);
-  
+
+  // Use the unified file detail hook
+  const {
+    file,
+    loading,
+    error,
+    updatePI,
+    updateSponsor,
+    updateStatus,
+    updateDBNo,
+    updateNotes,
+    updateDateReceived,
+    updateStatusDate,
+    deleteFile,
+  } = useFileDetail(id);
+
   // Individual field states for inline editing
   const [editingPI, setEditingPI] = useState(false);
   const [editingSponsor, setEditingSponsor] = useState(false);
@@ -52,7 +62,7 @@ export default function FileDetail() {
   const [editingDBNo, setEditingDBNo] = useState(false);
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
-  
+
   // Loading states for individual fields
   const [savingPI, setSavingPI] = useState(false);
   const [savingSponsor, setSavingSponsor] = useState(false);
@@ -61,337 +71,84 @@ export default function FileDetail() {
   const [savingDBNo, setSavingDBNo] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
-  
+
   // Temporary values for editing
   const [tempDBNo, setTempDBNo] = useState('');
   const [tempStatus, setTempStatus] = useState('');
   const [tempNotes, setTempNotes] = useState('');
-  
+
   // Get PI and Sponsor data for autocomplete
   const { pis, createPI } = usePIs();
   const { sponsors, createSponsor } = useSponsors();
 
-  useEffect(() => {
-    if (id) {
-      fetchFile();
-    }
-  }, [id]);
-
-  const fetchFile = async () => {
-    if (!id) return;
-    
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('files')
-        .select(`
-          *,
-          pis!inner(name),
-          sponsors!inner(name)
-        `)
-        .eq('id', id)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      if (!data) {
-        toast({
-          title: "Error",
-          description: "File not found.",
-          variant: "destructive",
-        });
-        navigate('/proposals');
-        return;
-      }
-
-      const formattedFile = {
-        ...data,
-        pi_name: data.pis.name,
-        sponsor_name: data.sponsors.name,
-      };
-
-      setFile(formattedFile);
-    } catch (error) {
-      console.error('Error fetching file:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch file details. Please try again.",
-        variant: "destructive",
-      });
-      navigate('/proposals');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Note: We don't auto-navigate on error - let the user see the error message
+  // The "File not found" UI below handles the case when file is null
 
   const handleDelete = async () => {
-    if (!id) return;
-
-    try {
-      const { error } = await supabase
-        .from('files')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Proposal deleted successfully.",
-      });
-
+    const success = await deleteFile();
+    if (success) {
       navigate('/proposals');
-    } catch (error) {
-      console.error('Error deleting file:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete proposal. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
   // Individual field save functions
   const handlePIChange = async (piId: string) => {
     if (!file || savingPI) return;
-
     setSavingPI(true);
-    try {
-      const { error } = await supabase
-        .from('files')
-        .update({
-          pi_id: piId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', file.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "PI updated successfully.",
-      });
-
-      await fetchFile();
-      setEditingPI(false);
-    } catch (error) {
-      console.error('Error updating PI:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update PI. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingPI(false);
-    }
+    const success = await updatePI(piId);
+    if (success) setEditingPI(false);
+    setSavingPI(false);
   };
 
   const handleSponsorChange = async (sponsorId: string) => {
     if (!file || savingSponsor) return;
-
     setSavingSponsor(true);
-    try {
-      const { error } = await supabase
-        .from('files')
-        .update({
-          sponsor_id: sponsorId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', file.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Sponsor updated successfully.",
-      });
-
-      await fetchFile();
-      setEditingSponsor(false);
-    } catch (error) {
-      console.error('Error updating sponsor:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update sponsor. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingSponsor(false);
-    }
+    const success = await updateSponsor(sponsorId);
+    if (success) setEditingSponsor(false);
+    setSavingSponsor(false);
   };
 
   const handleDateReceivedChange = async (date: Date | undefined) => {
     if (!file || savingDateReceived) return;
-
     setSavingDateReceived(true);
-    try {
-      const { error } = await supabase
-        .from('files')
-        .update({
-          date_received: date?.toISOString().split('T')[0] || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', file.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Date received updated successfully.",
-      });
-
-      await fetchFile();
-      setEditingDateReceived(false);
-    } catch (error) {
-      console.error('Error updating date received:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update date received. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingDateReceived(false);
-    }
+    const success = await updateDateReceived(date);
+    if (success) setEditingDateReceived(false);
+    setSavingDateReceived(false);
   };
 
   const handleStatusDateChange = async (date: Date | undefined) => {
     if (!file || savingStatusDate) return;
-
     setSavingStatusDate(true);
-    try {
-      const { error } = await supabase
-        .from('files')
-        .update({
-          date_status_change: date?.toISOString() || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', file.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Status date updated successfully.",
-      });
-
-      await fetchFile();
-      setEditingStatusDate(false);
-    } catch (error) {
-      console.error('Error updating status date:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update status date. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingStatusDate(false);
-    }
+    const success = await updateStatusDate(date);
+    if (success) setEditingStatusDate(false);
+    setSavingStatusDate(false);
   };
 
   const handleDBNoChange = async () => {
     if (!file || savingDBNo || !tempDBNo.trim()) return;
-
     setSavingDBNo(true);
-    try {
-      const { error } = await supabase
-        .from('files')
-        .update({
-          db_no: tempDBNo.trim(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', file.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "DB No. updated successfully.",
-      });
-
-      await fetchFile();
-      setEditingDBNo(false);
-    } catch (error) {
-      console.error('Error updating DB No.:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update DB No. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingDBNo(false);
-    }
+    const success = await updateDBNo(tempDBNo.trim());
+    if (success) setEditingDBNo(false);
+    setSavingDBNo(false);
   };
 
   const handleStatusChange = async (newStatus: string) => {
     if (!file || savingStatus) return;
-
     setSavingStatus(true);
-    try {
-      const { error } = await supabase
-        .from('files')
-        .update({
-          status: newStatus as any,
-          date_status_change: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', file.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Status updated successfully.",
-      });
-
-      await fetchFile();
-      setEditingStatus(false);
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update status. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingStatus(false);
-    }
+    const success = await updateStatus(newStatus);
+    if (success) setEditingStatus(false);
+    setSavingStatus(false);
   };
 
   const handleNotesChange = async () => {
     if (!file || savingNotes) return;
-
     setSavingNotes(true);
-    try {
-      const { error } = await supabase
-        .from('files')
-        .update({
-          notes: tempNotes.trim() || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', file.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Notes updated successfully.",
-      });
-
-      await fetchFile();
-      setEditingNotes(false);
-    } catch (error) {
-      console.error('Error updating notes:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update notes. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSavingNotes(false);
-    }
+    const success = await updateNotes(tempNotes.trim());
+    if (success) setEditingNotes(false);
+    setSavingNotes(false);
   };
 
-  const statusOptions = ['In', 'Process', 'Pending', 'Pending Signatures', 'Done', 'On Hold', 'Withdrawn'];
+  const statusOptions = ['In', 'Process', 'Pending', 'Pending Signature', 'Pending Signatures', 'Done', 'On Hold', 'Withdrawn'];
 
   if (loading) {
     return (
@@ -408,7 +165,9 @@ export default function FileDetail() {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center py-8">
-          <p className="text-muted-foreground">File not found.</p>
+          <p className="text-muted-foreground">
+            {error ? `Error: ${error.message}` : 'File not found.'}
+          </p>
           <Button onClick={() => navigate('/proposals')} className="mt-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Proposals

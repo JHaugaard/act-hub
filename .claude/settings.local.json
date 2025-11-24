@@ -68,7 +68,10 @@
       "Bash(scripts/data/migrate-to-production.js)",
       "Bash(git commit:*)",
       "Bash(fly deploy:*)",
-      "Bash(/tmp/prod_test.json)"
+      "Bash(/tmp/prod_test.json)",
+      "Skill(ci-cd-implement)",
+      "Bash(flyctl auth whoami:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

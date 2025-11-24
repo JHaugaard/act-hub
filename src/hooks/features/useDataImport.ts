@@ -275,7 +275,7 @@ export function useDataImport() {
     if (!validationResults) return;
 
     try {
-      let totalOperations = pisData.length + sponsorsData.length + filesData.length;
+      const totalOperations = pisData.length + sponsorsData.length + filesData.length;
       let currentOperation = 0;
 
       // Create unique PI names mapping

@@ -8,6 +8,7 @@ on:
     branches: [main, dev]
   pull_request:
     branches: [main]
+  workflow_call: # Allow this workflow to be called by deploy.yml
 
 jobs:
   build:

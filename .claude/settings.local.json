@@ -71,7 +71,9 @@
       "Bash(/tmp/prod_test.json)",
       "Skill(ci-cd-implement)",
       "Bash(flyctl auth whoami:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(flyctl apps list:*)",
+      "Bash(flyctl tokens create:*)"
     ],
     "deny": [],
     "ask": []

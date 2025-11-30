@@ -73,7 +73,8 @@
       "Bash(flyctl auth whoami:*)",
       "Bash(npm run lint:*)",
       "Bash(flyctl apps list:*)",
-      "Bash(flyctl tokens create:*)"
+      "Bash(flyctl tokens create:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

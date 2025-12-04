@@ -74,7 +74,10 @@
       "Bash(npm run lint:*)",
       "Bash(flyctl apps list:*)",
       "Bash(flyctl tokens create:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []

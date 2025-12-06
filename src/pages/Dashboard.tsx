@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Users, Building2, TrendingUp, Plus } from 'lucide-react';
+import { FileText, Users, Building2, TrendingUp, Plus, CheckSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ProposalForm } from '@/components/ProposalForm';
+import { CreateActionItemDialog } from '@/components/CreateActionItemDialog';
 import { useDashboard, useFiles } from '@/hooks/useData';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isActionItemDialogOpen, setIsActionItemDialogOpen] = useState(false);
   
   const statusCards = [
     { status: 'In', icon: FileText, label: 'In' },
@@ -82,7 +84,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="flex justify-start mt-6">
+      <div className="flex justify-start gap-3 mt-6">
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -97,7 +99,17 @@ const Dashboard = () => {
             <ProposalForm onSuccess={handleFormSuccess} />
           </DialogContent>
         </Dialog>
+
+        <Button onClick={() => setIsActionItemDialogOpen(true)}>
+          <CheckSquare className="h-4 w-4 mr-2" />
+          Add Action Item
+        </Button>
       </div>
+
+      <CreateActionItemDialog
+        open={isActionItemDialogOpen}
+        onOpenChange={setIsActionItemDialogOpen}
+      />
 
       {selectedStatus && (
         <div className="space-y-4">

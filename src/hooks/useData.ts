@@ -30,6 +30,7 @@ import { usePocketBaseDashboard } from './data/pocketbase/usePocketBaseDashboard
 import { usePocketBaseRelatedProposals } from './data/pocketbase/usePocketBaseRelatedProposals';
 import { usePocketBaseFileAttachments } from './data/pocketbase/usePocketBaseFileAttachments';
 import { usePocketBaseFileDetail } from './data/pocketbase/usePocketBaseFileDetail';
+import { usePocketBaseActionItems } from './data/pocketbase/usePocketBaseActionItems';
 
 // Mock hooks (development/testing)
 import { useMockFiles } from './data/mock/useMockFiles';
@@ -38,6 +39,7 @@ import { useMockDashboard } from './data/mock/useMockDashboard';
 import { useMockRelatedProposals } from './data/mock/useMockRelatedProposals';
 import { useMockFileAttachments } from './data/mock/useMockFileAttachments';
 import { useMockFileDetail } from './data/mock/useMockFileDetail';
+import { useMockActionItems } from './data/mock/useMockActionItems';
 
 // Initialize mock data if using mock mode
 if (USE_MOCK_DATA) {
@@ -89,7 +91,15 @@ export const useFileDetail = USE_MOCK_DATA
     ? usePocketBaseFileDetail
     : useSupabaseFileDetail;
 
+export const useActionItems = USE_MOCK_DATA
+  ? useMockActionItems
+  : USE_POCKETBASE
+    ? usePocketBaseActionItems
+    : useMockActionItems; // Fallback to mock if no Supabase implementation
+
 // Also export types for convenience
 export type { FileRecord, SortField, SortDirection } from './data/supabase/useFiles';
 export type { PI, Sponsor } from './data/supabase/useProposalData';
 export type { FileDetailRecord } from './data/supabase/useFileDetail';
+export type { ActionItem, TaskCategory, CreateActionItemInput, UpdateActionItemInput } from '@/types/actionItem';
+export { TASK_CATEGORIES } from '@/types/actionItem';

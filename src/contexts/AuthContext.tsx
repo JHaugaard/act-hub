@@ -2,6 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { pb } from '@/integrations/pocketbase/client';
 import type { RecordModel } from 'pocketbase';
 
+// Check if we're in mock mode
+const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || (import.meta.env.VITE_USE_MOCK_DATA === 'true' ? 'mock' : 'supabase');
+const USE_MOCK_AUTH = DATA_SOURCE === 'mock';
+
 // User type based on PocketBase's users collection
 interface PocketBaseUser {
   id: string;
@@ -45,11 +49,27 @@ function modelToUser(model: RecordModel | null): PocketBaseUser | null {
   };
 }
 
+// Mock user for development without backend
+const MOCK_USER: PocketBaseUser = {
+  id: 'mock-user-id',
+  email: 'dev@localhost',
+  name: 'Dev User',
+  avatar: '',
+  created: new Date().toISOString(),
+  updated: new Date().toISOString(),
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<PocketBaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<PocketBaseUser | null>(USE_MOCK_AUTH ? MOCK_USER : null);
+  const [loading, setLoading] = useState(!USE_MOCK_AUTH);
 
   useEffect(() => {
+    // In mock mode, user is already set
+    if (USE_MOCK_AUTH) {
+      console.log('🔓 Mock auth: Auto-logged in as dev@localhost');
+      return;
+    }
+
     // Check if user is already authenticated (from localStorage)
     const initAuth = () => {
       if (pb.authStore.isValid && pb.authStore.model) {

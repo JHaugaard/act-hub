@@ -16,6 +16,7 @@ import EditSponsor from "./pages/EditSponsor";
 
 import ImportData from "./pages/ImportData";
 import DBDistiller from "./pages/DBDistiller";
+import ActionItems from "./pages/ActionItems";
 import NotFound from "./pages/NotFound";
 import PasswordReset from "./pages/PasswordReset";
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/sponsors/:id/edit" element={<ProtectedRoute><EditSponsor /></ProtectedRoute>} />
             <Route path="/import" element={<ProtectedRoute><ImportData /></ProtectedRoute>} />
             <Route path="/distiller" element={<ProtectedRoute><DBDistiller /></ProtectedRoute>} />
+            <Route path="/action-items" element={<ProtectedRoute><ActionItems /></ProtectedRoute>} />
             
             <Route path="/auth" element={<Auth />} />
             <Route path="/password-reset" element={<PasswordReset />} />

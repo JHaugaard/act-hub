@@ -77,7 +77,11 @@
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
       "Bash(git fetch:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(git tag:*)",
+      "Bash(gh run list:*)"
     ],
     "deny": [],
     "ask": []

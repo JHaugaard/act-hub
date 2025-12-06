@@ -1,9 +1,9 @@
-# Session Summary - November 24, 2025
+# Session Summary - December 6, 2025
 
-## CI/CD Implementation Complete
+## v1.0.0 Released - Action Items Tracker
 
 ### Overview
-Successfully implemented CI/CD pipelines for automated testing and deployment to Fly.io. The app now has full continuous integration (lint, type check, build verification) and continuous deployment (auto-deploy to Fly.io on merge to main).
+Implemented Action Items tracker feature and released as v1.0.0. Full CRUD with inline editing, sidebar and dashboard integration.
 
 ---
 
@@ -28,49 +28,55 @@ Successfully implemented CI/CD pipelines for automated testing and deployment to
 
 ## Tasks Completed This Session
 
-### 1. CI/CD Pipeline Implementation
-Created split CI/CD workflow using the `ci-cd-implement` skill:
+### 1. Action Items Feature Implementation
+Full CRUD tracker for task management linked to proposals:
 
-| File | Purpose |
-|------|---------|
-| `.github/workflows/ci.yml` | Runs lint, type check, build on all pushes and PRs |
-| `.github/workflows/deploy.yml` | Deploys frontend to Fly.io after CI passes on main |
-| `CICD-SECRETS.md` | Documents FLY_API_TOKEN setup |
-| `docs/ci-cd-basics.md` | Conceptual overview of CI/CD for reference |
+| Component | Purpose |
+|-----------|---------|
+| `src/types/actionItem.ts` | Type definitions, TASK_CATEGORIES const |
+| `src/hooks/data/mock/useMockActionItems.ts` | Mock localStorage implementation |
+| `src/hooks/data/pocketbase/usePocketBaseActionItems.ts` | Production PocketBase hook |
+| `src/components/ActionItemsTable.tsx` | Table with inline editing |
+| `src/components/CreateActionItemDialog.tsx` | Dialog for creating items |
+| `src/pages/ActionItems.tsx` | Main page component |
 
-### 2. ESLint Configuration Fixes
-Fixed linting errors that blocked CI:
-- Added `pocketbase-data/**` to ignores (generated types)
-- Disabled strict TypeScript rules for migrated codebase:
-  - `@typescript-eslint/no-explicit-any`
-  - `@typescript-eslint/no-unused-vars`
-  - `@typescript-eslint/no-empty-object-type`
-  - `@typescript-eslint/no-require-imports`
-- Fixed `let` → `const` in `useDataImport.ts`
+### 2. Task Categories
+```
+Local Setup, Email Sponsor, Email PI/Team, Review Docs, Draft, Edit/Revise, PI Letter, Setup, Other
+```
 
-### 3. GitHub Secrets Configuration
-- Created org-level Fly.io deploy token: `flyctl tokens create org personal -x 999999h`
-- Added `FLY_API_TOKEN` secret to GitHub repository
+### 3. UI Integration
+- Sidebar: "Action Items" at bottom with separator
+- Dashboard: "Add Action Item" button next to "Add Proposal"
+- Action Items page: Button moved next to title
 
-### 4. Workflow Simplification
-- Removed PocketBase API deployment from CD pipeline (database doesn't need redeployment on code changes)
-- Frontend-only deployment is cleaner and faster
+### 4. Mock Auth Bypass
+Added auto-login for mock mode development:
+- `src/contexts/AuthContext.tsx` - Bypasses auth when `VITE_DATA_SOURCE="mock"`
+- Logs in as `dev@localhost` automatically
+
+### 5. Version Bump & Release
+- Updated `package.json` to v1.0.0
+- Created git tag `v1.0.0`
+- Merged PR #9 to main
+- Deployed via GitHub Actions to fly.io
 
 ---
 
-## CI/CD Workflow
+## Database: action_items Collection
 
-```
-Feature branch work
-       ↓
-   git push  →  CI runs (lint, type check, build)
-       ↓
-  Open PR    →  CI runs again, shows ✓/✗ on PR
-       ↓
-   Merge     →  CI runs + Deploy to Fly.io
-       ↓
-  Live app updated
-```
+**Status:** Migration file created, needs manual creation in PocketBase Admin
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| db_no | Text | No | Display reference |
+| file_id | Relation → files | No | Nullable for "General" items |
+| task | Select | Yes | 9 predefined categories |
+| notes | Text | No | Max 100 characters |
+| is_active | Bool | No | Active/Complete toggle |
+| date_entered | Date | Yes | Auto-generated |
+
+**Migration file:** `pocketbase-data/migrations/1733500000_created_action_items.js`
 
 ---
 
@@ -78,17 +84,25 @@ Feature branch work
 
 | File | Purpose |
 |------|---------|
-| `.github/workflows/ci.yml` | CI pipeline - lint, type check, build |
-| `CICD-SECRETS.md` | Secret configuration documentation |
-| `docs/ci-cd-basics.md` | CI/CD conceptual guide |
+| `src/types/actionItem.ts` | ActionItem types and TASK_CATEGORIES |
+| `src/hooks/data/mock/useMockActionItems.ts` | Mock hook for localStorage |
+| `src/hooks/data/pocketbase/usePocketBaseActionItems.ts` | PocketBase hook |
+| `src/components/ActionItemsTable.tsx` | Table with inline editing |
+| `src/components/CreateActionItemDialog.tsx` | Create dialog |
+| `src/pages/ActionItems.tsx` | Action Items page |
+| `pocketbase-data/migrations/1733500000_created_action_items.js` | DB migration |
 
 ## Files Modified This Session
 
 | File | Changes |
 |------|---------|
-| `.github/workflows/deploy.yml` | Simplified to frontend-only, calls ci.yml |
-| `eslint.config.js` | Relaxed rules, added ignores |
-| `src/hooks/features/useDataImport.ts` | Fixed let → const |
+| `src/App.tsx` | Added /action-items route |
+| `src/components/AppSidebar.tsx` | Added Action Items to bottom with separator |
+| `src/contexts/AuthContext.tsx` | Mock auth bypass |
+| `src/hooks/useData.ts` | Added useActionItems export |
+| `src/lib/mockStorage.ts` | Added ACTION_ITEMS storage key |
+| `src/pages/Dashboard.tsx` | Added "Add Action Item" button |
+| `package.json` | Version bump to 1.0.0 |
 
 ---
 
@@ -100,21 +114,7 @@ Feature branch work
 | PIs | 505 |
 | Sponsors | 527 |
 | Files | 1,125 |
-
----
-
-## Key Notes
-
-### PocketBase as Shared Resource
-The PocketBase instance on Fly.io can serve multiple apps:
-- Any app can connect via `https://proposaltracker-api.fly.dev`
-- Use separate collections per app for data isolation
-- Renaming not recommended (data migration complexity)
-
-### Linting Warnings
-Remaining warnings are safe to ignore:
-- React Fast Refresh warnings from shadcn/ui components
-- useEffect dependency warnings (intentional patterns)
+| action_items | (pending creation) |
 
 ---
 
@@ -122,30 +122,29 @@ Remaining warnings are safe to ignore:
 
 ### Start Local Environment
 ```bash
-# Start PocketBase (Docker)
-docker-compose -f docker-compose.local.yml up -d
+# Option 1: Mock mode (no backend needed)
+# Set VITE_DATA_SOURCE="mock" in .env
+npm run dev
 
-# Start frontend dev server
+# Option 2: PocketBase mode
+docker-compose -f docker-compose.local.yml up -d
 npm run dev
 # → http://localhost:8080
 ```
 
 ### Environment Configuration
 ```bash
-# .env (local development)
-VITE_DATA_SOURCE="pocketbase"
+# .env (currently set to pocketbase)
+VITE_DATA_SOURCE="pocketbase"  # or "mock" for no-backend dev
 VITE_POCKETBASE_URL="http://127.0.0.1:8090"
 VITE_USE_MOCK_DATA="false"
 ```
-
-### Test Credentials (Local)
-- **Email:** jhaugaard@mac.com
-- **Password:** test123456
 
 ---
 
 ## Previous Sessions
 
+- **November 24, 2025:** CI/CD implementation, GitHub Actions setup
 - **November 23, 2025:** Data migration to production, FileDetail page fix, tri-mode hooks
 - **November 23, 2025 (earlier):** First production deployment to fly.io, custom domain setup
 - **November 2, 2025:** PocketBase local development setup, schema creation, CSV data import
@@ -153,7 +152,8 @@ VITE_USE_MOCK_DATA="false"
 
 ---
 
+**Current Version:** v1.0.0
 **Current Branch:** main
 **Working Directory:** `/Volumes/dev/develop/act-hub`
 **Deployment Platform:** fly.io
-**Status:** CI/CD fully operational, auto-deploy on merge to main
+**Status:** Deployed, pending action_items collection creation in PocketBase Admin

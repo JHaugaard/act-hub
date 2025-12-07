@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Papa from 'papaparse';
-import { supabase } from '@/integrations/supabase/client';
+import { pb } from '@/integrations/pocketbase/client';
 import { useToast } from '@/hooks/ui/use-toast';
 
 interface ValidationError {
@@ -110,7 +110,7 @@ export function useDataImport() {
 
   const parseDate = (dateStr: string): Date | null => {
     if (!dateStr || dateStr.trim() === '') return null;
-    
+
     const parsed = new Date(dateStr);
     return isNaN(parsed.getTime()) ? null : parsed;
   };
@@ -298,54 +298,62 @@ export function useDataImport() {
 
       setImportProgress({ stage: 'Creating PIs...', current: 0, total: totalOperations });
 
-      // Upsert PIs
-      const piInserts = Array.from(uniquePis.values()).map(pi => ({ name: pi.name }));
-      const { data: createdPis, error: piError } = await supabase
-        .from('pis')
-        .upsert(piInserts, { onConflict: 'name', ignoreDuplicates: false })
-        .select();
-
-      if (piError) throw piError;
-      currentOperation += piInserts.length;
+      // Create PIs one by one (PocketBase doesn't have upsert, so we check existence first)
+      const piNameToId = new Map<string, string>();
+      for (const pi of Array.from(uniquePis.values())) {
+        try {
+          // Try to find existing PI
+          const existing = await pb.collection('pis').getFirstListItem(`name="${pi.name}"`).catch(() => null);
+          if (existing) {
+            piNameToId.set(normalizeString(pi.name), existing.id);
+          } else {
+            const created = await pb.collection('pis').create({ name: pi.name });
+            piNameToId.set(normalizeString(pi.name), created.id);
+          }
+        } catch (err) {
+          console.error('Error creating PI:', pi.name, err);
+        }
+        currentOperation++;
+        setImportProgress({ stage: 'Creating PIs...', current: currentOperation, total: totalOperations });
+      }
 
       setImportProgress({ stage: 'Creating Sponsors...', current: currentOperation, total: totalOperations });
 
-      // Upsert Sponsors
-      const sponsorInserts = Array.from(uniqueSponsors.values()).map(sponsor => ({ name: sponsor.sponsor }));
-      const { data: createdSponsors, error: sponsorError } = await supabase
-        .from('sponsors')
-        .upsert(sponsorInserts, { onConflict: 'name', ignoreDuplicates: false })
-        .select();
-
-      if (sponsorError) throw sponsorError;
-      currentOperation += sponsorInserts.length;
-
-      // Create lookup maps for IDs
-      const piNameToId = new Map<string, string>();
-      createdPis?.forEach(pi => {
-        piNameToId.set(normalizeString(pi.name), pi.id);
-      });
-
+      // Create Sponsors one by one
       const sponsorNameToId = new Map<string, string>();
-      createdSponsors?.forEach(sponsor => {
-        sponsorNameToId.set(normalizeString(sponsor.name), sponsor.id);
-      });
+      for (const sponsor of Array.from(uniqueSponsors.values())) {
+        try {
+          // Try to find existing Sponsor
+          const existing = await pb.collection('sponsors').getFirstListItem(`name="${sponsor.sponsor}"`).catch(() => null);
+          if (existing) {
+            sponsorNameToId.set(normalizeString(sponsor.sponsor), existing.id);
+          } else {
+            const created = await pb.collection('sponsors').create({ name: sponsor.sponsor });
+            sponsorNameToId.set(normalizeString(sponsor.sponsor), created.id);
+          }
+        } catch (err) {
+          console.error('Error creating Sponsor:', sponsor.sponsor, err);
+        }
+        currentOperation++;
+        setImportProgress({ stage: 'Creating Sponsors...', current: currentOperation, total: totalOperations });
+      }
 
       setImportProgress({ stage: 'Creating Files...', current: currentOperation, total: totalOperations });
 
-      // Insert Files with normalized db_no (strip "DB " prefix)
-      const fileInserts = filesData.map(file => {
+      // Insert Files
+      let filesCreated = 0;
+      for (const file of filesData) {
         const piId = piNameToId.get(normalizeString(file.pi_name));
         const sponsorId = sponsorNameToId.get(normalizeString(file.sponsor_name));
-        
+
         let normalizedDbNo = file.db_no;
         if (typeof normalizedDbNo === 'string' && normalizedDbNo.toUpperCase().startsWith('DB ')) {
           normalizedDbNo = normalizedDbNo.substring(3).trim();
         }
 
-        return {
+        const fileData = {
           db_no: normalizedDbNo,
-          status: file.status as any,
+          status: file.status,
           pi_id: piId,
           sponsor_id: sponsorId,
           cayuse: file.cayuse || null,
@@ -353,21 +361,29 @@ export function useDataImport() {
           notes: file.notes || null,
           to_set_up: parseDate(file.to_set_up)?.toISOString().split('T')[0] || null,
           external_link: file.external_link || null,
-          date_status_change: new Date().toISOString() // Set current timestamp
+          date_status_change: new Date().toISOString()
         };
-      });
 
-      const { data: createdFiles, error: fileError } = await supabase
-        .from('files')
-        .upsert(fileInserts, { onConflict: 'db_no', ignoreDuplicates: false })
-        .select();
-
-      if (fileError) throw fileError;
+        try {
+          // Try to find existing file by db_no
+          const existing = await pb.collection('files').getFirstListItem(`db_no="${normalizedDbNo}"`).catch(() => null);
+          if (existing) {
+            await pb.collection('files').update(existing.id, fileData);
+          } else {
+            await pb.collection('files').create(fileData);
+          }
+          filesCreated++;
+        } catch (err) {
+          console.error('Error creating file:', file.db_no, err);
+        }
+        currentOperation++;
+        setImportProgress({ stage: 'Creating Files...', current: currentOperation, total: totalOperations });
+      }
 
       const results: ImportResults = {
-        pisCreated: piInserts.length,
-        sponsorsCreated: sponsorInserts.length,
-        filesCreated: createdFiles?.length || 0
+        pisCreated: uniquePis.size,
+        sponsorsCreated: uniqueSponsors.size,
+        filesCreated: filesCreated
       };
 
       setImportResults(results);

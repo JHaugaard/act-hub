@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useToast } from '@/hooks/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { pb } from '@/integrations/pocketbase/client';
 import { PI } from '@/hooks/useData';
 
 const EditPI = () => {
@@ -21,17 +21,10 @@ const EditPI = () => {
   useEffect(() => {
     const fetchPI = async () => {
       if (!id) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('pis')
-          .select('*')
-          .eq('id', id)
-          .single();
 
-        if (error) throw error;
-        
-        setPI(data);
+      try {
+        const data = await pb.collection('pis').getOne(id);
+        setPI({ id: data.id, name: data.name });
         setName(data.name);
       } catch (error) {
         console.error('Error fetching PI:', error);
@@ -54,12 +47,7 @@ const EditPI = () => {
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('pis')
-        .update({ name: name.trim() })
-        .eq('id', id);
-
-      if (error) throw error;
+      await pb.collection('pis').update(id, { name: name.trim() });
 
       toast({
         title: "Success",

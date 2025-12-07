@@ -2,7 +2,11 @@
 
 /**
  * Migrate data from local PocketBase to production
- * Usage: node scripts/data/migrate-to-production.js
+ *
+ * Usage:
+ *   LOCAL_ADMIN_EMAIL=admin@local.test LOCAL_ADMIN_PASSWORD=yourpassword \
+ *   PROD_ADMIN_EMAIL=admin@prod.com PROD_ADMIN_PASSWORD=prodpassword \
+ *   node scripts/data/migrate-to-production.js
  */
 
 import PocketBase from 'pocketbase';
@@ -10,14 +14,15 @@ import PocketBase from 'pocketbase';
 const LOCAL_URL = process.env.LOCAL_POCKETBASE_URL || 'http://localhost:8090';
 const PROD_URL = process.env.PROD_POCKETBASE_URL || 'https://proposaltracker-api.fly.dev';
 
+// No default credentials - must be provided via environment variables
 const LOCAL_ADMIN = {
-  email: process.env.LOCAL_ADMIN_EMAIL || 'admin@local.test',
-  password: process.env.LOCAL_ADMIN_PASSWORD || 'admin123456',
+  email: process.env.LOCAL_ADMIN_EMAIL,
+  password: process.env.LOCAL_ADMIN_PASSWORD,
 };
 
 const PROD_ADMIN = {
-  email: process.env.PROD_ADMIN_EMAIL || 'admin@local.test',
-  password: process.env.PROD_ADMIN_PASSWORD || 'admin123456',
+  email: process.env.PROD_ADMIN_EMAIL,
+  password: process.env.PROD_ADMIN_PASSWORD,
 };
 
 async function authenticateAdmin(pb, credentials, label) {
@@ -58,6 +63,21 @@ async function fetchAllRecords(pb, collection) {
 }
 
 async function migrateData() {
+  // Validate required environment variables
+  if (!LOCAL_ADMIN.email || !LOCAL_ADMIN.password) {
+    console.error('❌ Missing local admin credentials:');
+    console.error('   LOCAL_ADMIN_EMAIL - Local PocketBase admin email');
+    console.error('   LOCAL_ADMIN_PASSWORD - Local PocketBase admin password');
+    process.exit(1);
+  }
+
+  if (!PROD_ADMIN.email || !PROD_ADMIN.password) {
+    console.error('❌ Missing production admin credentials:');
+    console.error('   PROD_ADMIN_EMAIL - Production PocketBase admin email');
+    console.error('   PROD_ADMIN_PASSWORD - Production PocketBase admin password');
+    process.exit(1);
+  }
+
   console.log('\n🚀 Starting PocketBase data migration\n');
   console.log(`📤 Source: ${LOCAL_URL}`);
   console.log(`📥 Target: ${PROD_URL}\n`);

@@ -4,15 +4,34 @@
  * Initialize PocketBase schema (collections and fields)
  * This creates the necessary collections that match your Supabase schema
  *
- * Usage: node scripts/setup-pocketbase-schema.js
+ * Usage:
+ *   PB_ADMIN_EMAIL=admin@example.com PB_ADMIN_PASSWORD=yourpassword node scripts/setup-pocketbase-schema.js
+ *
  * Run this AFTER starting PocketBase container
  */
 
 import PocketBase from 'pocketbase';
 
 const POCKETBASE_URL = process.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
+const ADMIN_EMAIL = process.env.PB_ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.PB_ADMIN_PASSWORD;
 
 async function setupSchema() {
+  // Validate required environment variables
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+    console.error('❌ Missing required environment variables:');
+    console.error('   PB_ADMIN_EMAIL - Admin email address');
+    console.error('   PB_ADMIN_PASSWORD - Admin password (min 10 characters)');
+    console.error('\nUsage:');
+    console.error('   PB_ADMIN_EMAIL=admin@example.com PB_ADMIN_PASSWORD=yourpassword node scripts/setup-pocketbase-schema.js');
+    process.exit(1);
+  }
+
+  if (ADMIN_PASSWORD.length < 10) {
+    console.error('❌ PB_ADMIN_PASSWORD must be at least 10 characters');
+    process.exit(1);
+  }
+
   console.log(`\n🚀 Setting up PocketBase schema at ${POCKETBASE_URL}...\n`);
 
   const pb = new PocketBase(POCKETBASE_URL);
@@ -24,8 +43,8 @@ async function setupSchema() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        identity: 'admin@local.test',
-        password: 'admin123456',
+        identity: ADMIN_EMAIL,
+        password: ADMIN_PASSWORD,
       }),
     });
 
@@ -40,9 +59,9 @@ async function setupSchema() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'admin@local.test',
-          password: 'admin123456',
-          passwordConfirm: 'admin123456',
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD,
+          passwordConfirm: ADMIN_PASSWORD,
         }),
       });
 
@@ -54,8 +73,8 @@ async function setupSchema() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            identity: 'admin@local.test',
-            password: 'admin123456',
+            identity: ADMIN_EMAIL,
+            password: ADMIN_PASSWORD,
           }),
         });
 

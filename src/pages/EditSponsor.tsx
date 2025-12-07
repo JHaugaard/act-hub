@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useToast } from '@/hooks/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { pb } from '@/integrations/pocketbase/client';
 import { Sponsor } from '@/hooks/useData';
 
 const EditSponsor = () => {
@@ -21,17 +21,10 @@ const EditSponsor = () => {
   useEffect(() => {
     const fetchSponsor = async () => {
       if (!id) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('sponsors')
-          .select('*')
-          .eq('id', id)
-          .single();
 
-        if (error) throw error;
-        
-        setSponsor(data);
+      try {
+        const data = await pb.collection('sponsors').getOne(id);
+        setSponsor({ id: data.id, name: data.name });
         setName(data.name);
       } catch (error) {
         console.error('Error fetching sponsor:', error);
@@ -54,12 +47,7 @@ const EditSponsor = () => {
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('sponsors')
-        .update({ name: name.trim() })
-        .eq('id', id);
-
-      if (error) throw error;
+      await pb.collection('sponsors').update(id, { name: name.trim() });
 
       toast({
         title: "Success",

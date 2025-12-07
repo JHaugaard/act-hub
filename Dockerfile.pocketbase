@@ -18,5 +18,11 @@ RUN mkdir -p /pb_data
 # Expose port 8080 (fly.io standard)
 EXPOSE 8080
 
-# Run PocketBase on port 8080
-CMD ["/usr/local/bin/pocketbase", "serve", "--http=0.0.0.0:8080", "--dir=/pb_data"]
+# CORS origins - restrict to known domains
+# Set via environment variable, defaults to production domains
+ENV PB_CORS_ORIGINS="https://proposaltracker.net,https://proposaltracker-web.fly.dev"
+
+# Run PocketBase on port 8080 with CORS restrictions
+# Note: PocketBase handles CORS internally based on the origins setting in the admin UI
+# The --origins flag can be used to set allowed origins at startup
+CMD ["/bin/sh", "-c", "/usr/local/bin/pocketbase serve --http=0.0.0.0:8080 --dir=/pb_data --origins=\"${PB_CORS_ORIGINS}\""]

@@ -1,6 +1,6 @@
 /**
  * PocketBase Files Hook
- * Mirrors the Supabase useFiles hook but uses PocketBase API
+ * Handles proposal data operations
  */
 
 import { useState, useEffect } from 'react';
@@ -135,6 +135,54 @@ export function usePocketBaseFiles() {
     }
   };
 
+  const createFile = async (data: {
+    db_no: string;
+    pi_id: string;
+    sponsor_id: string;
+    status: string;
+    date_received: string;
+    cayuse?: string | null;
+    notes?: string | null;
+  }): Promise<boolean> => {
+    try {
+      await pb.collection('files').create({
+        ...data,
+        date_status_change: new Date().toISOString(),
+      });
+      await fetchFiles(); // Refresh the list
+      return true;
+    } catch (error: any) {
+      console.error('Error creating file in PocketBase:', error);
+      throw error; // Re-throw to let caller handle specific error codes
+    }
+  };
+
+  const updateFile = async (
+    fileId: string,
+    data: {
+      db_no?: string;
+      pi_id?: string;
+      sponsor_id?: string;
+      status?: string;
+      date_received?: string;
+      cayuse?: string | null;
+      notes?: string | null;
+      date_status_change?: string;
+    }
+  ): Promise<boolean> => {
+    try {
+      await pb.collection('files').update(fileId, {
+        ...data,
+        updated_at: new Date().toISOString(),
+      });
+      await fetchFiles(); // Refresh the list
+      return true;
+    } catch (error: any) {
+      console.error('Error updating file in PocketBase:', error);
+      throw error; // Re-throw to let caller handle specific error codes
+    }
+  };
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
@@ -204,6 +252,8 @@ export function usePocketBaseFiles() {
     handleSort,
     statusCounts,
     updateFileStatus,
+    createFile,
+    updateFile,
     refetch: fetchFiles,
   };
 }

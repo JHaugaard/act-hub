@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { pb } from '@/integrations/pocketbase/client';
+import { isValidPocketBaseId } from '@/lib/utils';
 
 export interface RelatedProposal {
   id: string;
@@ -25,6 +26,15 @@ export function usePocketBaseRelatedProposals(entityId?: string | null, entityTy
     setLoading(true);
     try {
       const targetId = id || entityId;
+
+      // Validate ID format to prevent injection
+      if (!targetId || !isValidPocketBaseId(targetId)) {
+        console.warn('Invalid PocketBase ID format:', targetId);
+        setRelatedProposals([]);
+        setLoading(false);
+        return;
+      }
+
       const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
 
       // Query PocketBase REST API to find files with matching PI or Sponsor
@@ -34,8 +44,10 @@ export function usePocketBaseRelatedProposals(entityId?: string | null, entityTy
       let hasMore = true;
 
       while (hasMore) {
+        // Use encodeURIComponent for the filter value (ID is already validated)
+        const filter = encodeURIComponent(`${filterField}="${targetId}"`);
         const response = await fetch(
-          `${POCKETBASE_URL}/api/collections/files/records?page=${page}&perPage=500&filter=${filterField}="${targetId}"&expand=pi_id,sponsor_id`,
+          `${POCKETBASE_URL}/api/collections/files/records?page=${page}&perPage=500&filter=${filter}&expand=pi_id,sponsor_id`,
           {
             headers: {
               'Authorization': `Bearer ${pb.authStore.token}`,

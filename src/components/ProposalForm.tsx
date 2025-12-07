@@ -15,8 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AutocompleteInput } from '@/components/ui/autocomplete-input';
-import { usePIs, useSponsors } from '@/hooks/useData';
-import { supabase } from '@/integrations/supabase/client';
+import { usePIs, useSponsors, useFiles } from '@/hooks/useData';
 import { cn } from '@/lib/utils';
 import type { FileRecord } from '@/hooks/useData';
 
@@ -51,6 +50,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { pis, createPI } = usePIs();
   const { sponsors, createSponsor } = useSponsors();
+  const { createFile, updateFile } = useFiles();
   const isEditing = !!editingFile;
 
   const form = useForm<ProposalFormData>({
@@ -126,12 +126,21 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
 
   const onSubmit = async (data: ProposalFormData) => {
     setIsSubmitting(true);
-    
+
     try {
       if (isEditing && editingFile) {
         // Update existing proposal
         const statusChanged = data.status !== editingFile.status;
-        const updateData: any = {
+        const updateData: {
+          db_no: string;
+          pi_id: string;
+          sponsor_id: string;
+          cayuse: string | null;
+          status: string;
+          date_received: string;
+          notes: string | null;
+          date_status_change?: string;
+        } = {
           db_no: data.db_no,
           pi_id: data.pi_id,
           sponsor_id: data.sponsor_id,
@@ -139,7 +148,6 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
           status: data.status,
           date_received: format(data.date_received, 'yyyy-MM-dd'),
           notes: data.notes || null,
-          updated_at: new Date().toISOString(),
         };
 
         // Only update date_status_change if status actually changed
@@ -147,36 +155,26 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
           updateData.date_status_change = new Date().toISOString();
         }
 
-        const { error } = await supabase
-          .from('files')
-          .update(updateData)
-          .eq('id', editingFile.id);
-
-        if (error) throw error;
+        await updateFile(editingFile.id, updateData);
         toast.success('Proposal updated successfully!');
       } else {
         // Create new proposal
-        const { error } = await supabase
-          .from('files')
-          .insert([{
-            db_no: data.db_no,
-            pi_id: data.pi_id,
-            sponsor_id: data.sponsor_id,
-            cayuse: data.cayuse || null,
-            status: data.status,
-            date_received: format(data.date_received, 'yyyy-MM-dd'),
-            notes: data.notes || null,
-            date_status_change: new Date().toISOString(),
-          }]);
-
-        if (error) throw error;
+        await createFile({
+          db_no: data.db_no,
+          pi_id: data.pi_id,
+          sponsor_id: data.sponsor_id,
+          cayuse: data.cayuse || null,
+          status: data.status,
+          date_received: format(data.date_received, 'yyyy-MM-dd'),
+          notes: data.notes || null,
+        });
         toast.success('Proposal created successfully!');
       }
 
       onSuccess?.();
     } catch (error: any) {
       console.error('Error saving proposal:', error);
-      if (error?.code === '23505') {
+      if (error?.data?.db_no?.code === 'validation_not_unique') {
         toast.error('A proposal with this DB No. already exists');
       } else {
         toast.error(`Failed to ${isEditing ? 'update' : 'create'} proposal. Please try again.`);

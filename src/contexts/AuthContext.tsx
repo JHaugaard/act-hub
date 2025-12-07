@@ -3,7 +3,7 @@ import { pb } from '@/integrations/pocketbase/client';
 import type { RecordModel } from 'pocketbase';
 
 // Check if we're in mock mode
-const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || (import.meta.env.VITE_USE_MOCK_DATA === 'true' ? 'mock' : 'supabase');
+const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || 'pocketbase';
 const USE_MOCK_AUTH = DATA_SOURCE === 'mock';
 
 // User type based on PocketBase's users collection
@@ -20,10 +20,10 @@ interface AuthContextType {
   user: PocketBaseUser | null;
   isAuthenticated: boolean;
   loading: boolean;
-  signUp: (email: string, password: string, name?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -90,28 +90,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signUp = async (email: string, password: string, name?: string): Promise<{ error: Error | null }> => {
-    try {
-      // Create the user
-      await pb.collection('users').create({
-        email,
-        password,
-        passwordConfirm: password,
-        name: name || email.split('@')[0], // Use email prefix as default name
-      });
-
-      // Auto sign-in after registration
-      await pb.collection('users').authWithPassword(email, password);
-
-      return { error: null };
-    } catch (err: any) {
-      console.error('Sign up error:', err);
-      return {
-        error: new Error(err?.message || 'Failed to create account')
-      };
-    }
-  };
-
   const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
     try {
       await pb.collection('users').authWithPassword(email, password);
@@ -141,14 +119,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updatePassword = async (newPassword: string): Promise<{ error: Error | null }> => {
+    try {
+      if (!pb.authStore.model?.id) {
+        throw new Error('No authenticated user');
+      }
+      await pb.collection('users').update(pb.authStore.model.id, {
+        password: newPassword,
+        passwordConfirm: newPassword,
+      });
+      return { error: null };
+    } catch (err: any) {
+      console.error('Password update error:', err);
+      return {
+        error: new Error(err?.message || 'Failed to update password')
+      };
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     loading,
-    signUp,
     signIn,
     signOut,
     resetPassword,
+    updatePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

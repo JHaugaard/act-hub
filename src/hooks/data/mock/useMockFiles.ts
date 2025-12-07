@@ -19,7 +19,7 @@ export function useMockFiles() {
       const pisData = mockStorage.getAll(STORAGE_KEYS.PIS);
       const sponsorsData = mockStorage.getAll(STORAGE_KEYS.SPONSORS);
 
-      // Join data (simulating Supabase joins)
+      // Join data (simulating database joins)
       const formattedFiles = filesData.map((file: any) => {
         const pi = pisData.find((p: any) => p.id === file.pi_id);
         const sponsor = sponsorsData.find((s: any) => s.id === file.sponsor_id);

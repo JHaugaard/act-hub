@@ -1,7 +1,7 @@
 import { FileText, Users, Building2, Database, User, Edit, Key, LogOut, Zap, CheckSquare } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { pb } from '@/integrations/pocketbase/client';
 
 import {
   Sidebar,
@@ -49,7 +49,7 @@ export function AppSidebar() {
   const { toast } = useToast();
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [displayName, setDisplayName] = useState(user?.user_metadata?.display_name || '');
+  const [displayName, setDisplayName] = useState(user?.name || '');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -74,14 +74,12 @@ export function AppSidebar() {
 
   const handleEditProfile = async () => {
     if (!user) return;
-    
+
     setIsUpdatingProfile(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { display_name: displayName }
+      await pb.collection('users').update(user.id, {
+        name: displayName,
       });
-
-      if (error) throw error;
 
       toast({
         title: "Success",
@@ -131,12 +129,10 @@ export function AppSidebar() {
     }
 
     setIsChangingPassword(true);
-    
+
     try {
       // Ensure we have a valid session before attempting password change
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      
-      if (!currentSession) {
+      if (!pb.authStore.isValid) {
         console.error('No valid session found');
         toast({
           title: "Session Expired",

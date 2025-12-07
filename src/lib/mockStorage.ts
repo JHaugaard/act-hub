@@ -1,6 +1,6 @@
 /**
  * Mock Storage Layer - localStorage-based data persistence
- * Mimics Supabase API for seamless development without backend
+ * Mock storage for seamless development without backend
  */
 
 // Generate UUID-like ID for new records

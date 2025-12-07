@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { pb } from '@/integrations/pocketbase/client';
 import { useToast } from '@/hooks/ui/use-toast';
+import { isValidPocketBaseId } from '@/lib/utils';
 
 export interface FileAttachment {
   id: string;
@@ -34,6 +35,15 @@ export function usePocketBaseFileAttachments(fileId?: string | null) {
     setLoading(true);
     try {
       const targetFileId = id || fileId;
+
+      // Validate ID format to prevent injection
+      if (!targetFileId || !isValidPocketBaseId(targetFileId)) {
+        console.warn('Invalid PocketBase ID format:', targetFileId);
+        setAttachments([]);
+        setLoading(false);
+        return;
+      }
+
       const records = await pb.collection('file_attachments').getFullList({
         filter: `file_id = "${targetFileId}"`,
         sort: '-uploaded_at',
@@ -77,7 +87,7 @@ export function usePocketBaseFileAttachments(fileId?: string | null) {
         p.fileName === file.name ? { ...p, progress: 50 } : p
       ));
 
-      // Note: PocketBase file field handling differs from Supabase
+      // Note: PocketBase file field handling
       // File will be stored in pb_public directory by PocketBase
       const record = await pb.collection('file_attachments').create(formData);
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { pb } from '@/integrations/pocketbase/client';
 import { useToast } from '@/hooks/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,33 +19,15 @@ const PasswordReset = () => {
 
   useEffect(() => {
     // Check for password reset token in URL
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    const type = searchParams.get('type');
+    const token = searchParams.get('token');
 
-    console.log('Password reset page - URL params:', { type, accessToken: !!accessToken, refreshToken: !!refreshToken });
+    console.log('Password reset page - URL params:', { token: !!token });
 
-    if (type === 'recovery' && accessToken && refreshToken) {
-      // Set the session with the tokens from the URL but don't redirect
-      supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      }).then(({ error }) => {
-        if (error) {
-          console.error('Error setting session:', error);
-          toast({
-            title: "Invalid Reset Link",
-            description: "This password reset link is invalid or has expired.",
-            variant: "destructive",
-          });
-          navigate('/auth');
-        } else {
-          console.log('Session set successfully for password reset');
-          setValidToken(true);
-        }
-      });
+    if (token) {
+      // PocketBase password reset flow uses a token
+      setValidToken(true);
     } else {
-      console.log('Invalid reset link - missing required parameters');
+      console.log('Invalid reset link - missing token');
       toast({
         title: "Invalid Reset Link",
         description: "This password reset link is invalid or has expired.",
@@ -57,7 +39,7 @@ const PasswordReset = () => {
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast({
         title: "Error",
@@ -79,33 +61,29 @@ const PasswordReset = () => {
     setLoading(true);
 
     try {
-      console.log('Attempting password update...');
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
-
-      if (error) {
-        console.error('Password update error:', error);
-        toast({
-          title: "Error",
-          description: error.message || "Failed to update password.",
-          variant: "destructive",
-        });
-      } else {
-        console.log('Password updated successfully');
-        toast({
-          title: "Success",
-          description: "Your password has been updated successfully. You can now sign in with your new password.",
-        });
-        // Sign out after password reset to force fresh login
-        await supabase.auth.signOut();
-        navigate('/auth');
+      const token = searchParams.get('token');
+      if (!token) {
+        throw new Error('No reset token found');
       }
-    } catch (err) {
-      console.error('Unexpected error:', err);
+
+      console.log('Attempting password reset with token...');
+      await pb.collection('users').confirmPasswordReset(
+        token,
+        password,
+        password
+      );
+
+      console.log('Password reset successfully');
+      toast({
+        title: "Success",
+        description: "Your password has been updated successfully. You can now sign in with your new password.",
+      });
+      navigate('/auth');
+    } catch (err: any) {
+      console.error('Password reset error:', err);
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: err?.message || "Failed to reset password. The link may have expired.",
         variant: "destructive",
       });
     } finally {
@@ -160,9 +138,9 @@ const PasswordReset = () => {
                 minLength={6}
               />
             </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               disabled={loading || !password || !confirmPassword}
             >
               {loading ? (

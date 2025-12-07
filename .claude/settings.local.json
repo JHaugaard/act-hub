@@ -81,7 +81,9 @@
       "Bash(gh pr create:*)",
       "Bash(gh pr merge:*)",
       "Bash(git tag:*)",
-      "Bash(gh run list:*)"
+      "Bash(gh run list:*)",
+      "Bash(docker mcp:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

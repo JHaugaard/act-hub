@@ -5,25 +5,16 @@
  * Usage in components:
  *   import { useFiles, usePIs, useSponsors } from '@/hooks/useData'
  *
- * This will use either mock, PocketBase, or real Supabase hooks based on VITE_DATA_SOURCE
- * Environment: VITE_DATA_SOURCE = "mock" | "pocketbase" | "supabase"
+ * This will use either mock or PocketBase hooks based on VITE_DATA_SOURCE
+ * Environment: VITE_DATA_SOURCE = "mock" | "pocketbase"
  */
 
-const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || (import.meta.env.VITE_USE_MOCK_DATA === 'true' ? 'mock' : 'supabase');
+const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || 'pocketbase';
 const USE_MOCK_DATA = DATA_SOURCE === 'mock';
-const USE_POCKETBASE = DATA_SOURCE === 'pocketbase';
 
 console.log(`🔧 Data Source: ${DATA_SOURCE.toUpperCase()}`);
 
-// Supabase hooks (legacy)
-import { useFiles as useRealFiles } from './data/supabase/useFiles';
-import { usePIs as useRealPIs, useSponsors as useRealSponsors } from './data/supabase/useProposalData';
-import { useDashboard as useRealDashboard } from './data/supabase/useDashboard';
-import { useRelatedProposals as useRealRelatedProposals } from './data/supabase/useRelatedProposals';
-import { useFileAttachments as useRealFileAttachments } from './data/supabase/useFileAttachments';
-import { useSupabaseFileDetail } from './data/supabase/useFileDetail';
-
-// PocketBase hooks (current production)
+// PocketBase hooks (production)
 import { usePocketBaseFiles } from './data/pocketbase/usePocketBaseFiles';
 import { usePocketBasePIs, usePocketBaseSponsors } from './data/pocketbase/usePocketBaseProposalData';
 import { usePocketBaseDashboard } from './data/pocketbase/usePocketBaseDashboard';
@@ -49,57 +40,18 @@ if (USE_MOCK_DATA) {
 }
 
 // Export the appropriate hooks based on configuration
-export const useFiles = USE_MOCK_DATA
-  ? useMockFiles
-  : USE_POCKETBASE
-    ? usePocketBaseFiles
-    : useRealFiles;
+export const useFiles = USE_MOCK_DATA ? useMockFiles : usePocketBaseFiles;
+export const usePIs = USE_MOCK_DATA ? useMockPIs : usePocketBasePIs;
+export const useSponsors = USE_MOCK_DATA ? useMockSponsors : usePocketBaseSponsors;
+export const useDashboard = USE_MOCK_DATA ? useMockDashboard : usePocketBaseDashboard;
+export const useRelatedProposals = USE_MOCK_DATA ? useMockRelatedProposals : usePocketBaseRelatedProposals;
+export const useFileAttachments = USE_MOCK_DATA ? useMockFileAttachments : usePocketBaseFileAttachments;
+export const useFileDetail = USE_MOCK_DATA ? useMockFileDetail : usePocketBaseFileDetail;
+export const useActionItems = USE_MOCK_DATA ? useMockActionItems : usePocketBaseActionItems;
 
-export const usePIs = USE_MOCK_DATA
-  ? useMockPIs
-  : USE_POCKETBASE
-    ? usePocketBasePIs
-    : useRealPIs;
-
-export const useSponsors = USE_MOCK_DATA
-  ? useMockSponsors
-  : USE_POCKETBASE
-    ? usePocketBaseSponsors
-    : useRealSponsors;
-
-export const useDashboard = USE_MOCK_DATA
-  ? useMockDashboard
-  : USE_POCKETBASE
-    ? usePocketBaseDashboard
-    : useRealDashboard;
-
-export const useRelatedProposals = USE_MOCK_DATA
-  ? useMockRelatedProposals
-  : USE_POCKETBASE
-    ? usePocketBaseRelatedProposals
-    : useRealRelatedProposals;
-
-export const useFileAttachments = USE_MOCK_DATA
-  ? useMockFileAttachments
-  : USE_POCKETBASE
-    ? usePocketBaseFileAttachments
-    : useRealFileAttachments;
-
-export const useFileDetail = USE_MOCK_DATA
-  ? useMockFileDetail
-  : USE_POCKETBASE
-    ? usePocketBaseFileDetail
-    : useSupabaseFileDetail;
-
-export const useActionItems = USE_MOCK_DATA
-  ? useMockActionItems
-  : USE_POCKETBASE
-    ? usePocketBaseActionItems
-    : useMockActionItems; // Fallback to mock if no Supabase implementation
-
-// Also export types for convenience
-export type { FileRecord, SortField, SortDirection } from './data/supabase/useFiles';
-export type { PI, Sponsor } from './data/supabase/useProposalData';
-export type { FileDetailRecord } from './data/supabase/useFileDetail';
+// Export types from PocketBase hooks
+export type { FileRecord, SortField, SortDirection } from './data/pocketbase/usePocketBaseFiles';
+export type { PI, Sponsor } from './data/pocketbase/usePocketBaseProposalData';
+export type { FileDetailRecord } from './data/pocketbase/usePocketBaseFileDetail';
 export type { ActionItem, TaskCategory, CreateActionItemInput, UpdateActionItemInput } from '@/types/actionItem';
 export { TASK_CATEGORIES } from '@/types/actionItem';

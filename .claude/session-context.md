@@ -32,6 +32,7 @@ Addressed remaining security findings:
      - Content-Security-Policy header (restricts sources)
      - Referrer-Policy header
      - Permissions-Policy header (disables geolocation, mic, camera)
+   - Moved headers into location blocks (nginx `add_header` in locations overrides server-level)
 
 4. **Fixed: CORS Restrictions for PocketBase**
    - Updated `Dockerfile.pocketbase` to use `--origins` flag

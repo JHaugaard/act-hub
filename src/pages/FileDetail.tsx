@@ -49,6 +49,7 @@ export default function FileDetail() {
     updateStatus,
     updateDBNo,
     updateNotes,
+    updateCayuse,
     updateDateReceived,
     updateStatusDate,
     deleteFile,
@@ -62,6 +63,7 @@ export default function FileDetail() {
   const [editingDBNo, setEditingDBNo] = useState(false);
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
+  const [editingCayuse, setEditingCayuse] = useState(false);
 
   // Loading states for individual fields
   const [savingPI, setSavingPI] = useState(false);
@@ -71,11 +73,13 @@ export default function FileDetail() {
   const [savingDBNo, setSavingDBNo] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
+  const [savingCayuse, setSavingCayuse] = useState(false);
 
   // Temporary values for editing
   const [tempDBNo, setTempDBNo] = useState('');
   const [tempStatus, setTempStatus] = useState('');
   const [tempNotes, setTempNotes] = useState('');
+  const [tempCayuse, setTempCayuse] = useState('');
 
   // Get PI and Sponsor data for autocomplete
   const { pis, createPI } = usePIs();
@@ -148,6 +152,14 @@ export default function FileDetail() {
     setSavingNotes(false);
   };
 
+  const handleCayuseChange = async () => {
+    if (!file || savingCayuse) return;
+    setSavingCayuse(true);
+    const success = await updateCayuse(tempCayuse.trim());
+    if (success) setEditingCayuse(false);
+    setSavingCayuse(false);
+  };
+
   const statusOptions = ['In', 'Process', 'Pending', 'Pending Signature', 'Pending Signatures', 'Done', 'On Hold', 'Withdrawn'];
 
   if (loading) {
@@ -191,7 +203,7 @@ export default function FileDetail() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Proposal {file.db_no}
+              {file.db_no}
             </h1>
             <p className="text-muted-foreground">
               {file.pi_name} • {file.sponsor_name}
@@ -427,12 +439,54 @@ export default function FileDetail() {
                 </div>
               </div>
 
-              {file.cayuse && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Cayuse</label>
-                  <p className="font-medium">{file.cayuse}</p>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Cayuse</label>
+                <div className="mt-1">
+                  {editingCayuse ? (
+                    <div className="flex gap-2">
+                      <Input
+                        value={tempCayuse}
+                        onChange={(e) => setTempCayuse(e.target.value)}
+                        placeholder="Enter Cayuse ID"
+                        disabled={savingCayuse}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={handleCayuseChange}
+                        disabled={savingCayuse}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setEditingCayuse(false);
+                          setTempCayuse(file.cayuse || '');
+                        }}
+                        disabled={savingCayuse}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium">{file.cayuse || '-'}</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setTempCayuse(file.cayuse || '');
+                          setEditingCayuse(true);
+                        }}
+                        disabled={savingCayuse}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               {file.external_link && (
                 <div>

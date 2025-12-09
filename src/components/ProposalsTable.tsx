@@ -130,6 +130,7 @@ export function ProposalsTable({
           <SortableHeader field="status" currentField={sortField} direction={sortDirection} onSort={onSort}>
             Status
           </SortableHeader>
+          <TableHead>Cayuse</TableHead>
           <SortableHeader field="date_received" currentField={sortField} direction={sortDirection} onSort={onSort}>
             Date Received
           </SortableHeader>
@@ -189,6 +190,9 @@ export function ProposalsTable({
                   ))}
                 </SelectContent>
               </Select>
+            </TableCell>
+            <TableCell className="py-1">
+              {file.cayuse || '-'}
             </TableCell>
             <TableCell className="py-1">
               {file.date_received 

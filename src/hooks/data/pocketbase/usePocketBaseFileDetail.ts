@@ -176,6 +176,17 @@ export function usePocketBaseFileDetail(fileId: string | undefined) {
     return success;
   }, [updateFile, toast]);
 
+  const updateCayuse = useCallback(async (cayuse: string) => {
+    const success = await updateFile({ cayuse: cayuse || null } as any);
+    if (success) {
+      toast({
+        title: "Success",
+        description: "Cayuse updated successfully.",
+      });
+    }
+    return success;
+  }, [updateFile, toast]);
+
   const updateDateReceived = useCallback(async (date: Date | undefined) => {
     const success = await updateFile({
       date_received: date?.toISOString().split('T')[0] || null,
@@ -237,6 +248,7 @@ export function usePocketBaseFileDetail(fileId: string | undefined) {
     updateStatus,
     updateDBNo,
     updateNotes,
+    updateCayuse,
     updateDateReceived,
     updateStatusDate,
     deleteFile,

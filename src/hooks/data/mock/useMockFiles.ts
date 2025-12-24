@@ -34,10 +34,11 @@ export function useMockFiles() {
       // Client-side sorting
       const sortedFiles = [...formattedFiles].sort((a: any, b: any) => {
         if (sortField === 'db_no') {
-          // Extract numeric part from "DB 1234" or "1234" format
-          const getNumericValue = (dbNo: string) => {
-            const match = dbNo.match(/(\d+)/);
-            return match ? parseInt(match[1], 10) : 0;
+          // Extract ALL digits to handle any format
+          const getNumericValue = (dbNo: string | null | undefined) => {
+            if (!dbNo) return 0;
+            const digits = dbNo.replace(/\D/g, '');
+            return digits ? parseInt(digits, 10) : 0;
           };
           const aNum = getNumericValue(a.db_no);
           const bNum = getNumericValue(b.db_no);

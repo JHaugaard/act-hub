@@ -172,13 +172,13 @@ export function ProposalsTable({
                 </button>
               </RelatedProposalsPopover>
             </TableCell>
-            <TableCell className="py-1">
+            <TableCell className="py-1 w-[100px]">
               <Select
                 value={file.status}
                 onValueChange={(value) => onStatusChange(file.id, value)}
               >
                 <SelectTrigger className="w-auto h-auto p-0 border-0 shadow-none justify-start">
-                  <Badge variant={getStatusColor(file.status)} className="justify-start text-left">
+                  <Badge variant={getStatusColor(file.status)} className="justify-start text-left whitespace-nowrap">
                     {file.status}
                   </Badge>
                 </SelectTrigger>
@@ -195,25 +195,26 @@ export function ProposalsTable({
               {file.cayuse || '-'}
             </TableCell>
             <TableCell className="py-1">
-              {file.date_received
-                ? (() => {
-                    // Parse date without timezone conversion (YYYY-MM-DD format)
-                    const [year, month, day] = file.date_received.split('-').map(Number);
-                    return new Date(year, month - 1, day).toLocaleDateString();
-                  })()
-                : '-'
-              }
+              {(() => {
+                if (!file.date_received) return '-';
+                // Parse date without timezone conversion (YYYY-MM-DD format)
+                const parts = file.date_received.split('T')[0].split('-');
+                if (parts.length !== 3) return '-';
+                const [year, month, day] = parts.map(Number);
+                if (isNaN(year) || isNaN(month) || isNaN(day)) return '-';
+                return new Date(year, month - 1, day).toLocaleDateString();
+              })()}
             </TableCell>
             <TableCell className="py-1">
-              {file.date_status_change
-                ? (() => {
-                    // Handle both ISO datetime and date-only formats
-                    const dateStr = file.date_status_change.split('T')[0];
-                    const [year, month, day] = dateStr.split('-').map(Number);
-                    return new Date(year, month - 1, day).toLocaleDateString();
-                  })()
-                : '-'
-              }
+              {(() => {
+                if (!file.date_status_change) return '-';
+                // Handle both ISO datetime and date-only formats
+                const parts = file.date_status_change.split('T')[0].split('-');
+                if (parts.length !== 3) return '-';
+                const [year, month, day] = parts.map(Number);
+                if (isNaN(year) || isNaN(month) || isNaN(day)) return '-';
+                return new Date(year, month - 1, day).toLocaleDateString();
+              })()}
             </TableCell>
           </TableRow>
         ))}

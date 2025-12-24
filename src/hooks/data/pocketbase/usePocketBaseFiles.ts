@@ -210,10 +210,11 @@ export function usePocketBaseFiles() {
 
     // Handle numeric sorting for db_no (format: "DB 1234" or "1234")
     if (sortField === 'db_no') {
-      const getNumericValue = (dbNo: string) => {
-        // Extract numeric part from "DB 1234" or "1234" format
-        const match = dbNo.match(/(\d+)/);
-        return match ? parseInt(match[1], 10) : 0;
+      const getNumericValue = (dbNo: string | null | undefined) => {
+        if (!dbNo) return 0;
+        // Extract ALL digits and join them to handle any format
+        const digits = dbNo.replace(/\D/g, '');
+        return digits ? parseInt(digits, 10) : 0;
       };
       aValue = getNumericValue(a.db_no);
       bValue = getNumericValue(b.db_no);

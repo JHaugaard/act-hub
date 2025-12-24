@@ -226,14 +226,17 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
                 id="db_no"
                 {...form.register('db_no', {
                   setValueAs: (value) => {
-                    // Strip "DB " prefix if present (case insensitive)
-                    if (typeof value === 'string' && value.toUpperCase().startsWith('DB ')) {
-                      return value.substring(3).trim();
-                    }
-                    return value;
+                    if (typeof value !== 'string') return value;
+                    const trimmed = value.trim();
+                    // Strip "DB " prefix if present to get just the number
+                    const numOnly = trimmed.toUpperCase().startsWith('DB ')
+                      ? trimmed.substring(3).trim()
+                      : trimmed;
+                    // Always store with "DB " prefix
+                    return numOnly ? `DB ${numOnly}` : '';
                   }
                 })}
-                placeholder="e.g., 1001"
+                placeholder="e.g., DB 1001 or 1001"
                 className={form.formState.errors.db_no ? 'border-destructive' : ''}
               />
               {form.formState.errors.db_no && (

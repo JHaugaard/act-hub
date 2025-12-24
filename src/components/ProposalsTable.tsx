@@ -195,14 +195,23 @@ export function ProposalsTable({
               {file.cayuse || '-'}
             </TableCell>
             <TableCell className="py-1">
-              {file.date_received 
-                ? new Date(file.date_received).toLocaleDateString()
+              {file.date_received
+                ? (() => {
+                    // Parse date without timezone conversion (YYYY-MM-DD format)
+                    const [year, month, day] = file.date_received.split('-').map(Number);
+                    return new Date(year, month - 1, day).toLocaleDateString();
+                  })()
                 : '-'
               }
             </TableCell>
             <TableCell className="py-1">
-              {file.date_status_change 
-                ? new Date(file.date_status_change).toLocaleDateString()
+              {file.date_status_change
+                ? (() => {
+                    // Handle both ISO datetime and date-only formats
+                    const dateStr = file.date_status_change.split('T')[0];
+                    const [year, month, day] = dateStr.split('-').map(Number);
+                    return new Date(year, month - 1, day).toLocaleDateString();
+                  })()
                 : '-'
               }
             </TableCell>

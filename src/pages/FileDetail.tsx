@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -598,8 +598,12 @@ export default function FileDetail() {
                   ) : (
                     <div className="flex items-center justify-between">
                       <p className="font-medium">
-                        {file.date_received 
-                          ? new Date(file.date_received).toLocaleDateString()
+                        {file.date_received
+                          ? (() => {
+                              // Parse date without timezone conversion (YYYY-MM-DD format)
+                              const [year, month, day] = file.date_received.split('-').map(Number);
+                              return new Date(year, month - 1, day).toLocaleDateString();
+                            })()
                           : 'Not set'
                         }
                       </p>

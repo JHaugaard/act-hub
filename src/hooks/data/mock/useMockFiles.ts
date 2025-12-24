@@ -34,8 +34,13 @@ export function useMockFiles() {
       // Client-side sorting
       const sortedFiles = [...formattedFiles].sort((a: any, b: any) => {
         if (sortField === 'db_no') {
-          const aNum = parseInt(a.db_no) || 0;
-          const bNum = parseInt(b.db_no) || 0;
+          // Extract numeric part from "DB 1234" or "1234" format
+          const getNumericValue = (dbNo: string) => {
+            const match = dbNo.match(/(\d+)/);
+            return match ? parseInt(match[1], 10) : 0;
+          };
+          const aNum = getNumericValue(a.db_no);
+          const bNum = getNumericValue(b.db_no);
           return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
         }
 

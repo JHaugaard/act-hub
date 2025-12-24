@@ -208,11 +208,12 @@ export function usePocketBaseFiles() {
     let aValue: any = a[sortField];
     let bValue: any = b[sortField];
 
-    // Handle numeric sorting for db_no
+    // Handle numeric sorting for db_no (format: "DB 1234" or "1234")
     if (sortField === 'db_no') {
       const getNumericValue = (dbNo: string) => {
-        const match = dbNo.match(/^\d{1,4}/);
-        return match ? parseInt(match[0], 10) : 0;
+        // Extract numeric part from "DB 1234" or "1234" format
+        const match = dbNo.match(/(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
       };
       aValue = getNumericValue(a.db_no);
       bValue = getNumericValue(b.db_no);

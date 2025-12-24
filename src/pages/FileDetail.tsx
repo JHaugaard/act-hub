@@ -598,14 +598,18 @@ export default function FileDetail() {
                   ) : (
                     <div className="flex items-center justify-between">
                       <p className="font-medium">
-                        {file.date_received
-                          ? (() => {
-                              // Parse date without timezone conversion (YYYY-MM-DD format)
-                              const [year, month, day] = file.date_received.split('-').map(Number);
-                              return new Date(year, month - 1, day).toLocaleDateString();
-                            })()
-                          : 'Not set'
-                        }
+                        {(() => {
+                          const dateStr = file.date_received;
+                          if (!dateStr || String(dateStr).trim() === '') return 'Not set';
+                          const str = String(dateStr).split('T')[0];
+                          const match = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                          if (match) {
+                            const [, year, month, day] = match.map(Number);
+                            return new Date(year, month - 1, day).toLocaleDateString();
+                          }
+                          const d = new Date(dateStr + 'T12:00:00');
+                          return isNaN(d.getTime()) ? 'Not set' : d.toLocaleDateString();
+                        })()}
                       </p>
                       <Button
                         variant="ghost"

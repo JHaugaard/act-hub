@@ -196,24 +196,34 @@ export function ProposalsTable({
             </TableCell>
             <TableCell className="py-1">
               {(() => {
-                if (!file.date_received) return '-';
-                // Parse date without timezone conversion (YYYY-MM-DD format)
-                const parts = file.date_received.split('T')[0].split('-');
-                if (parts.length !== 3) return '-';
-                const [year, month, day] = parts.map(Number);
-                if (isNaN(year) || isNaN(month) || isNaN(day)) return '-';
-                return new Date(year, month - 1, day).toLocaleDateString();
+                const dateStr = file.date_received;
+                if (!dateStr || String(dateStr).trim() === '') return '-';
+                // Try to parse date - handle YYYY-MM-DD format without timezone shift
+                const str = String(dateStr).split('T')[0];
+                const match = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                if (match) {
+                  const [, year, month, day] = match.map(Number);
+                  return new Date(year, month - 1, day).toLocaleDateString();
+                }
+                // Fallback: try native parsing with timezone fix
+                const d = new Date(dateStr + 'T12:00:00');
+                return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
               })()}
             </TableCell>
             <TableCell className="py-1">
               {(() => {
-                if (!file.date_status_change) return '-';
-                // Handle both ISO datetime and date-only formats
-                const parts = file.date_status_change.split('T')[0].split('-');
-                if (parts.length !== 3) return '-';
-                const [year, month, day] = parts.map(Number);
-                if (isNaN(year) || isNaN(month) || isNaN(day)) return '-';
-                return new Date(year, month - 1, day).toLocaleDateString();
+                const dateStr = file.date_status_change;
+                if (!dateStr || String(dateStr).trim() === '') return '-';
+                // Try to parse date - handle various formats
+                const str = String(dateStr).split('T')[0];
+                const match = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                if (match) {
+                  const [, year, month, day] = match.map(Number);
+                  return new Date(year, month - 1, day).toLocaleDateString();
+                }
+                // Fallback: try native parsing
+                const d = new Date(dateStr);
+                return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
               })()}
             </TableCell>
           </TableRow>

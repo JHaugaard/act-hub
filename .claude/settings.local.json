@@ -84,7 +84,11 @@
       "Bash(gh run list:*)",
       "Bash(docker mcp:*)",
       "Bash(ls:*)",
-      "Bash(killall:*)"
+      "Bash(killall:*)",
+      "Bash(npm run build:*)",
+      "Bash(gh pr list:*)",
+      "Bash(flyctl deploy:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

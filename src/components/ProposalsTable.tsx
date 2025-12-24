@@ -198,32 +198,26 @@ export function ProposalsTable({
               {(() => {
                 const dateStr = file.date_received;
                 if (!dateStr || String(dateStr).trim() === '') return '-';
-                // Try to parse date - handle YYYY-MM-DD format without timezone shift
-                const str = String(dateStr).split('T')[0];
-                const match = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                // Extract YYYY-MM-DD from various formats (handles "2025-12-24 00:00:00 UTC", "2025-12-24T00:00:00", "2025-12-24")
+                const match = String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
                 if (match) {
                   const [, year, month, day] = match.map(Number);
                   return new Date(year, month - 1, day).toLocaleDateString();
                 }
-                // Fallback: try native parsing with timezone fix
-                const d = new Date(dateStr + 'T12:00:00');
-                return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
+                return '-';
               })()}
             </TableCell>
             <TableCell className="py-1">
               {(() => {
                 const dateStr = file.date_status_change;
                 if (!dateStr || String(dateStr).trim() === '') return '-';
-                // Try to parse date - handle various formats
-                const str = String(dateStr).split('T')[0];
-                const match = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                // Extract YYYY-MM-DD from various formats
+                const match = String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
                 if (match) {
                   const [, year, month, day] = match.map(Number);
                   return new Date(year, month - 1, day).toLocaleDateString();
                 }
-                // Fallback: try native parsing
-                const d = new Date(dateStr);
-                return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
+                return '-';
               })()}
             </TableCell>
           </TableRow>

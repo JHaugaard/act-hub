@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -61,7 +61,6 @@ export default function FileDetail() {
   const [editingDateReceived, setEditingDateReceived] = useState(false);
   const [editingStatusDate, setEditingStatusDate] = useState(false);
   const [editingDBNo, setEditingDBNo] = useState(false);
-  const [editingStatus, setEditingStatus] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [editingCayuse, setEditingCayuse] = useState(false);
 
@@ -77,7 +76,6 @@ export default function FileDetail() {
 
   // Temporary values for editing
   const [tempDBNo, setTempDBNo] = useState('');
-  const [tempStatus, setTempStatus] = useState('');
   const [tempNotes, setTempNotes] = useState('');
   const [tempCayuse, setTempCayuse] = useState('');
 
@@ -139,8 +137,7 @@ export default function FileDetail() {
   const handleStatusChange = async (newStatus: string) => {
     if (!file || savingStatus) return;
     setSavingStatus(true);
-    const success = await updateStatus(newStatus);
-    if (success) setEditingStatus(false);
+    await updateStatus(newStatus);
     setSavingStatus(false);
   };
 
@@ -249,7 +246,23 @@ export default function FileDetail() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">DB No.</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-muted-foreground">DB No.</label>
+                    {!editingDBNo && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => {
+                          setTempDBNo(file.db_no);
+                          setEditingDBNo(true);
+                        }}
+                        disabled={savingDBNo}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  </div>
                   <div className="mt-1">
                     {editingDBNo ? (
                       <div className="flex gap-2">
@@ -279,84 +292,51 @@ export default function FileDetail() {
                         </Button>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">{file.db_no}</p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setTempDBNo(file.db_no);
-                            setEditingDBNo(true);
-                          }}
-                          disabled={savingDBNo}
-                        >
-                          Edit
-                        </Button>
-                      </div>
+                      <p className="font-medium">{file.db_no}</p>
                     )}
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Status</label>
                   <div className="mt-1">
-                    {editingStatus ? (
-                      <div className="flex gap-2 items-center">
-                        <Select value={tempStatus} onValueChange={setTempStatus} disabled={savingStatus}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statusOptions.map((status) => (
-                              <SelectItem key={status} value={status}>
-                                {status}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          size="sm"
-                          onClick={() => handleStatusChange(tempStatus)}
-                          disabled={savingStatus || !tempStatus}
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditingStatus(false);
-                            setTempStatus(file.status);
-                          }}
-                          disabled={savingStatus}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between">
+                    <Select
+                      value={file.status}
+                      onValueChange={(value) => handleStatusChange(value)}
+                      disabled={savingStatus}
+                    >
+                      <SelectTrigger className="w-auto h-auto p-0 border-0 shadow-none justify-start">
                         <Badge variant={getStatusColor(file.status)} className="justify-start text-left">
-                          {file.status}
+                          {savingStatus ? 'Saving...' : file.status}
                         </Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setTempStatus(file.status);
-                            setEditingStatus(true);
-                          }}
-                          disabled={savingStatus}
-                        >
-                          Edit
-                        </Button>
-                      </div>
-                    )}
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">PI</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-muted-foreground">PI</label>
+                    {!editingPI && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => setEditingPI(true)}
+                        disabled={savingPI}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  </div>
                   <div className="mt-1">
                     {editingPI ? (
                       <AutocompleteInput
@@ -374,30 +354,33 @@ export default function FileDetail() {
                         disabled={savingPI}
                       />
                     ) : (
-                      <div className="flex items-center justify-between">
-                        <RelatedProposalsPopover
-                          entityId={file.pi_id}
-                          entityName={file.pi_name}
-                          entityType="pi"
-                        >
-                          <button className="font-medium text-primary hover:underline text-left">
-                            {file.pi_name}
-                          </button>
-                        </RelatedProposalsPopover>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setEditingPI(true)}
-                          disabled={savingPI}
-                        >
-                          Edit
-                        </Button>
-                      </div>
+                      <RelatedProposalsPopover
+                        entityId={file.pi_id}
+                        entityName={file.pi_name}
+                        entityType="pi"
+                      >
+                        <button className="font-medium text-primary hover:underline text-left">
+                          {file.pi_name}
+                        </button>
+                      </RelatedProposalsPopover>
                     )}
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Sponsor</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-muted-foreground">Sponsor</label>
+                    {!editingSponsor && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => setEditingSponsor(true)}
+                        disabled={savingSponsor}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  </div>
                   <div className="mt-1">
                     {editingSponsor ? (
                       <AutocompleteInput
@@ -415,32 +398,38 @@ export default function FileDetail() {
                         disabled={savingSponsor}
                       />
                     ) : (
-                      <div className="flex items-center justify-between">
-                        <RelatedProposalsPopover
-                          entityId={file.sponsor_id}
-                          entityName={file.sponsor_name}
-                          entityType="sponsor"
-                        >
-                          <button className="font-medium text-primary hover:underline text-left">
-                            {file.sponsor_name}
-                          </button>
-                        </RelatedProposalsPopover>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setEditingSponsor(true)}
-                          disabled={savingSponsor}
-                        >
-                          Edit
-                        </Button>
-                      </div>
+                      <RelatedProposalsPopover
+                        entityId={file.sponsor_id}
+                        entityName={file.sponsor_name}
+                        entityType="sponsor"
+                      >
+                        <button className="font-medium text-primary hover:underline text-left">
+                          {file.sponsor_name}
+                        </button>
+                      </RelatedProposalsPopover>
                     )}
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Cayuse</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-muted-foreground">Cayuse</label>
+                  {!editingCayuse && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => {
+                        setTempCayuse(file.cayuse || '');
+                        setEditingCayuse(true);
+                      }}
+                      disabled={savingCayuse}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
                 <div className="mt-1">
                   {editingCayuse ? (
                     <div className="flex gap-2">
@@ -470,20 +459,7 @@ export default function FileDetail() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">{file.cayuse || '-'}</p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setTempCayuse(file.cayuse || '');
-                          setEditingCayuse(true);
-                        }}
-                        disabled={savingCayuse}
-                      >
-                        Edit
-                      </Button>
-                    </div>
+                    <p className="font-medium">{file.cayuse || '-'}</p>
                   )}
                 </div>
               </div>
@@ -504,7 +480,23 @@ export default function FileDetail() {
               )}
 
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Notes</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-muted-foreground">Notes</label>
+                  {!editingNotes && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => {
+                        setTempNotes(file.notes || '');
+                        setEditingNotes(true);
+                      }}
+                      disabled={savingNotes}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
                 <div className="mt-1">
                   {editingNotes ? (
                     <div className="space-y-2">
@@ -537,24 +529,9 @@ export default function FileDetail() {
                       </div>
                     </div>
                   ) : (
-                    <div>
-                      <div className="flex items-start justify-between mb-1">
-                        <p className="text-sm whitespace-pre-wrap flex-1">
-                          {file.notes || 'No notes added'}
-                        </p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setTempNotes(file.notes || '');
-                            setEditingNotes(true);
-                          }}
-                          disabled={savingNotes}
-                        >
-                          Edit
-                        </Button>
-                      </div>
-                    </div>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {file.notes || 'No notes added'}
+                    </p>
                   )}
                 </div>
               </div>
@@ -568,7 +545,20 @@ export default function FileDetail() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Date Received</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-muted-foreground">Date Received</label>
+                  {!editingDateReceived && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setEditingDateReceived(true)}
+                      disabled={savingDateReceived}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
                 <div className="mt-1">
                   {editingDateReceived ? (
                     <Popover>
@@ -596,35 +586,37 @@ export default function FileDetail() {
                       </PopoverContent>
                     </Popover>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">
-                        {(() => {
-                          const dateStr = file.date_received;
-                          if (!dateStr || String(dateStr).trim() === '') return 'Not set';
-                          // Extract YYYY-MM-DD from various formats (handles "2025-12-24 00:00:00 UTC", "2025-12-24T00:00:00", "2025-12-24")
-                          const match = String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-                          if (match) {
-                            const [, year, month, day] = match.map(Number);
-                            return new Date(year, month - 1, day).toLocaleDateString();
-                          }
-                          return 'Not set';
-                        })()}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingDateReceived(true)}
-                        disabled={savingDateReceived}
-                      >
-                        Edit
-                      </Button>
-                    </div>
+                    <p className="font-medium">
+                      {(() => {
+                        const dateStr = file.date_received;
+                        if (!dateStr || String(dateStr).trim() === '') return 'Not set';
+                        const match = String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+                        if (match) {
+                          const [, year, month, day] = match.map(Number);
+                          return new Date(year, month - 1, day).toLocaleDateString();
+                        }
+                        return 'Not set';
+                      })()}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Status Last Changed</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-muted-foreground">Status Last Changed</label>
+                  {!editingStatusDate && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setEditingStatusDate(true)}
+                      disabled={savingStatusDate}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
                 <div className="mt-1">
                   {editingStatusDate ? (
                     <Popover>
@@ -638,8 +630,8 @@ export default function FileDetail() {
                           disabled={savingStatusDate}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {file.date_status_change 
-                            ? format(new Date(file.date_status_change), "PPP") 
+                          {file.date_status_change
+                            ? format(new Date(file.date_status_change), "PPP")
                             : "Pick a date"
                           }
                         </Button>
@@ -655,25 +647,15 @@ export default function FileDetail() {
                       </PopoverContent>
                     </Popover>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">
-                        {file.date_status_change 
-                          ? (() => {
-                              const d = new Date(file.date_status_change);
-                              return !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Not set';
-                            })()
-                          : 'Not set'
-                        }
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingStatusDate(true)}
-                        disabled={savingStatusDate}
-                      >
-                        Edit
-                      </Button>
-                    </div>
+                    <p className="font-medium">
+                      {file.date_status_change
+                        ? (() => {
+                            const d = new Date(file.date_status_change);
+                            return !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Not set';
+                          })()
+                        : 'Not set'
+                      }
+                    </p>
                   )}
                 </div>
               </div>

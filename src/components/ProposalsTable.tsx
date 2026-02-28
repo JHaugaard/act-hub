@@ -7,6 +7,7 @@ import { FileRecord, SortField, SortDirection } from '@/hooks/useData';
 import { HighlightText } from './HighlightText';
 import { RelatedProposalsPopover } from './RelatedProposalsPopover';
 import { useNavigate } from 'react-router-dom';
+import { formatDateOnly } from '@/utils/dateUtils';
 
 interface ProposalsTableProps {
   files: FileRecord[];
@@ -195,30 +196,10 @@ export function ProposalsTable({
               {file.cayuse || '-'}
             </TableCell>
             <TableCell className="py-1">
-              {(() => {
-                const dateStr = file.date_received;
-                if (!dateStr || String(dateStr).trim() === '') return '-';
-                // Extract YYYY-MM-DD from various formats (handles "2025-12-24 00:00:00 UTC", "2025-12-24T00:00:00", "2025-12-24")
-                const match = String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-                if (match) {
-                  const [, year, month, day] = match.map(Number);
-                  return new Date(year, month - 1, day).toLocaleDateString();
-                }
-                return '-';
-              })()}
+              {formatDateOnly(file.date_received) || '-'}
             </TableCell>
             <TableCell className="py-1">
-              {(() => {
-                const dateStr = file.date_status_change;
-                if (!dateStr || String(dateStr).trim() === '') return '-';
-                // Extract YYYY-MM-DD from various formats
-                const match = String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-                if (match) {
-                  const [, year, month, day] = match.map(Number);
-                  return new Date(year, month - 1, day).toLocaleDateString();
-                }
-                return '-';
-              })()}
+              {formatDateOnly(file.date_status_change) || '-'}
             </TableCell>
           </TableRow>
         ))}

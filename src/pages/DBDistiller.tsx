@@ -11,6 +11,7 @@ import { useDistillerTimeout } from '@/hooks/features/useDistillerTimeout';
 
 import { processExcelFile, ProcessedData, ProposalRecord } from '@/utils/distiller/spreadsheetProcessor';
 import { filterRecords, getUniqueStatuses, getStatusColorForPrint } from '@/utils/distiller/spreadsheetFilter';
+import { formatTimestamp } from '@/utils/dateUtils';
 
 // Fixed 7 statuses based on UI requirements
 const FIXED_STATUSES = [
@@ -171,7 +172,7 @@ export default function DBDistiller() {
             </style>
           </head>
           <body>
-            <p>Generated on: ${new Date().toLocaleString()}</p>
+            <p>Generated on: ${formatTimestamp(new Date().toISOString())}</p>
             ${clonedTable.innerHTML}
           </body>
         </html>
@@ -220,7 +221,7 @@ export default function DBDistiller() {
                 {processedData.totalRecords} records processed
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Loaded at: {new Date(processedData.processedAt).toLocaleString()}
+                Loaded at: {formatTimestamp(processedData.processedAt)}
               </p>
             </div>
 

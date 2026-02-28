@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRelatedProposals } from '@/hooks/useData';
-import { format } from 'date-fns';
+import { formatDateOnly } from '@/utils/dateUtils';
 
 interface RelatedProposalsPopoverProps {
   entityId: string;
@@ -97,7 +97,7 @@ export function RelatedProposalsPopover({
                         )}
                         {proposal.date_received && (
                           <div className="text-xs text-muted-foreground">
-                            {format(new Date(proposal.date_received), 'MMM d, yyyy')}
+                            {formatDateOnly(proposal.date_received, 'MMM d, yyyy')}
                           </div>
                         )}
                       </div>

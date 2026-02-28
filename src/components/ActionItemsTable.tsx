@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/utils/dateUtils';
 import { Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -169,7 +169,7 @@ export function ActionItemsTable({
                 )}
               </TableCell>
               <TableCell className="text-sm text-muted-foreground">
-                {format(new Date(item.date_entered), 'MM/dd/yy')}
+                {formatTimestamp(item.date_entered, 'MM/dd/yy')}
               </TableCell>
               <TableCell>
                 <AlertDialog>

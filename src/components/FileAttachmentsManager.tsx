@@ -8,6 +8,7 @@ import { Upload, Download, Trash2, FileText, X, CheckCircle, AlertCircle } from 
 import { useFileAttachments } from '@/hooks/useData';
 import { getFileIcon, getFileTypeLabel, isValidFileType, getMaxFileSize, getMaxFiles } from '@/utils/fileUtils';
 import { cn } from '@/lib/utils';
+import { formatDateOnly } from '@/utils/dateUtils';
 
 interface FileAttachmentsManagerProps {
   fileId: string;
@@ -196,7 +197,7 @@ export function FileAttachmentsManager({ fileId, readOnly = false }: FileAttachm
                     <span>{formatFileSize(attachment.file_size)}</span>
                     <span>•</span>
                     <Badge variant="outline" className="text-xs">
-                      {new Date(attachment.uploaded_at).toLocaleDateString()}
+                      {formatDateOnly(attachment.uploaded_at) || ''}
                     </Badge>
                   </div>
                 </div>

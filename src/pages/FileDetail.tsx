@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { formatDateOnly, formatTimestamp } from '@/utils/dateUtils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -587,16 +588,7 @@ export default function FileDetail() {
                     </Popover>
                   ) : (
                     <p className="font-medium">
-                      {(() => {
-                        const dateStr = file.date_received;
-                        if (!dateStr || String(dateStr).trim() === '') return 'Not set';
-                        const match = String(dateStr).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-                        if (match) {
-                          const [, year, month, day] = match.map(Number);
-                          return new Date(year, month - 1, day).toLocaleDateString();
-                        }
-                        return 'Not set';
-                      })()}
+                      {formatDateOnly(file.date_received) || 'Not set'}
                     </p>
                   )}
                 </div>
@@ -648,13 +640,7 @@ export default function FileDetail() {
                     </Popover>
                   ) : (
                     <p className="font-medium">
-                      {file.date_status_change
-                        ? (() => {
-                            const d = new Date(file.date_status_change);
-                            return !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Not set';
-                          })()
-                        : 'Not set'
-                      }
+                      {formatDateOnly(file.date_status_change) || 'Not set'}
                     </p>
                   )}
                 </div>
@@ -664,7 +650,7 @@ export default function FileDetail() {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">To Set Up</label>
                   <p className="font-medium">
-                    {new Date(file.to_set_up).toLocaleDateString()}
+                    {formatDateOnly(file.to_set_up)}
                   </p>
                 </div>
               )}
@@ -672,14 +658,14 @@ export default function FileDetail() {
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Created</label>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(file.created_at).toLocaleString()}
+                  {formatTimestamp(file.created_at)}
                 </p>
               </div>
 
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Last Updated</label>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(file.updated_at).toLocaleString()}
+                  {formatTimestamp(file.updated_at)}
                 </p>
               </div>
             </CardContent>

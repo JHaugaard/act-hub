@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FileRecord } from '@/hooks/useData';
-import { format } from 'date-fns';
+import { formatDateOnly, formatTimestamp } from '@/utils/dateUtils';
 
 export function generateProposalsPDF(
   files: FileRecord[],
@@ -18,7 +18,7 @@ export function generateProposalsPDF(
   doc.setFontSize(10);
   const pageWidth = doc.internal.pageSize.getWidth();
   doc.text(`Filter: ${statusFilter}`, pageWidth - 14, 20, { align: 'right' });
-  doc.text(`Generated: ${format(new Date(), 'PPP p')}`, pageWidth - 14, 27, { align: 'right' });
+  doc.text(`Generated: ${formatTimestamp(new Date().toISOString(), 'PPP p')}`, pageWidth - 14, 27, { align: 'right' });
   doc.text(`Total Proposals: ${totalCount}`, pageWidth - 14, 34, { align: 'right' });
   
   // Prepare table data
@@ -27,8 +27,8 @@ export function generateProposalsPDF(
     file.pi_name || '-',
     file.sponsor_name || '-',
     file.status || '-',
-    file.date_received ? format(new Date(file.date_received), 'MM/dd/yyyy') : '-',
-    file.date_status_change ? format(new Date(file.date_status_change), 'MM/dd/yyyy') : '-',
+    formatDateOnly(file.date_received, 'MM/dd/yyyy') || '-',
+    formatDateOnly(file.date_status_change, 'MM/dd/yyyy') || '-',
   ]);
   
   // Generate table

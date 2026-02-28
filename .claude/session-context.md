@@ -1,48 +1,47 @@
-# Session Context - December 9, 2025
+# Session Context - February 27, 2026
 
 ## Current Focus
-UI improvements deployed - Cayuse column, calendar fix, detail page updates.
+Timezone standardization — all date display now pinned to US Eastern (America/New_York).
 
 ## MCP Servers Added This Session
 None
 
 ## Completed This Session
 
-### UI Improvements (3 items)
+### Timezone Fix (1 item)
 
-1. **Added Cayuse column to Proposals table**
-   - New column between Status and Date Received
-   - Displays Cayuse ID or dash if empty
-   - Files: `src/components/ProposalsTable.tsx`
+1. **Standardized all date handling to US Eastern timezone**
+   - Created `src/utils/dateUtils.ts` with two helpers:
+     - `formatDateOnly()` — for YYYY-MM-DD date strings (noon-UTC trick prevents day shift)
+     - `formatTimestamp()` — for ISO 8601 timestamps (converts to America/New_York)
+   - Added `date-fns-tz` dependency (companion to existing `date-fns`)
+   - Updated 7 files to use the new helpers:
+     - `src/components/ProposalsTable.tsx`
+     - `src/pages/FileDetail.tsx`
+     - `src/components/FileAttachmentsManager.tsx`
+     - `src/components/ActionItemsTable.tsx`
+     - `src/components/RelatedProposalsPopover.tsx`
+     - `src/utils/pdfExport.ts`
+     - `src/pages/DBDistiller.tsx`
+   - Build passes cleanly
 
-2. **Fixed Calendar component for react-day-picker v9**
-   - Updated from v8 API to v9 API
-   - `Caption` → `MonthCaption`, `IconLeft/IconRight` → `Chevron`
-   - Month/year dropdown selectors now display properly
-   - Files: `src/components/ui/calendar.tsx`
-
-3. **FileDetail page improvements**
-   - Removed "Proposal" prefix from heading (now just shows DB number)
-   - Cayuse field now always visible (shows "-" if empty)
-   - Cayuse field is editable with inline Edit button
-   - Added `updateCayuse` function to both PocketBase and mock hooks
-   - Files: `src/pages/FileDetail.tsx`, `src/hooks/data/pocketbase/usePocketBaseFileDetail.ts`, `src/hooks/data/mock/useMockFileDetail.ts`
-
-### Housekeeping
-
-- **Deleted stale branch**: `wonderful-jepsen` (was an outdated auto-generated branch that would have reverted security fixes)
-- **Committed & pushed**: All UI changes to main
-- **CI/CD**: Automatic deployment triggered via GitHub Actions
+### Key Decisions
+- US Eastern (America/New_York) is the canonical display timezone
+- Date-only fields use noon-UTC construction to avoid day-boundary shift
+- Timestamps are converted to Eastern via `date-fns-tz` before display
+- Write-side code (storing dates) was left unchanged — ISO 8601 storage is correct
 
 ---
 
-## Previous Session Summary (December 7, 2025)
+## Previous Session Summary (December 9, 2025)
 
-### Security Hardening Complete
-- SQL injection protection in PocketBase filters
-- Default admin credentials removed from scripts
-- CSP and security headers added to nginx.conf
-- CORS restrictions configured for PocketBase
+### UI Improvements
+- Added Cayuse column to Proposals table
+- Fixed Calendar component for react-day-picker v9
+- FileDetail page improvements (editable Cayuse, cleaner heading)
+
+### Security Hardening (December 7, 2025)
+- SQL injection protection, default creds removed, CSP headers, CORS
 
 ---
 
@@ -74,5 +73,4 @@ None
 
 **Current Version:** v1.0.0
 **Current Branch:** main
-**Working Directory:** `/Volumes/dev/develop/act-hub`
 **Deployment Platform:** fly.io

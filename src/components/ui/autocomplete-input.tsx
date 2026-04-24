@@ -80,7 +80,6 @@ export function AutocompleteInput({
           aria-expanded={open}
           className={cn("w-full justify-between", className)}
           disabled={disabled}
-          onFocus={() => !disabled && setOpen(true)}
         >
           {selectedItem ? selectedItem.name : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -94,7 +93,7 @@ export function AutocompleteInput({
             value={searchValue}
             onValueChange={setSearchValue}
           />
-          <CommandList className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+          <CommandList className="max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
             {filteredItems.length === 0 && !showCreateOption ? (
               <CommandEmpty>
                 {searchValue ? `No results found for "${searchValue}".` : "Start typing to search..."}

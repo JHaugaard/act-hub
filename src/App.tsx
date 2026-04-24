@@ -18,7 +18,7 @@ import ImportData from "./pages/ImportData";
 import DBDistiller from "./pages/DBDistiller";
 import ActionItems from "./pages/ActionItems";
 import NotFound from "./pages/NotFound";
-import PasswordReset from "./pages/PasswordReset";
+
 
 const queryClient = new QueryClient();
 
@@ -42,7 +42,6 @@ const App = () => (
             <Route path="/action-items" element={<ProtectedRoute><ActionItems /></ProtectedRoute>} />
             
             <Route path="/auth" element={<Auth />} />
-            <Route path="/password-reset" element={<PasswordReset />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

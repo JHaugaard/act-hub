@@ -6,6 +6,11 @@ import type { RecordModel } from 'pocketbase';
 const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE || 'pocketbase';
 const USE_MOCK_AUTH = DATA_SOURCE === 'mock';
 
+// Hardcoded identity for token-based login.
+// Update this to match your PocketBase user email/username,
+// or set VITE_AUTH_IDENTITY in your .env file.
+const AUTH_IDENTITY = import.meta.env.VITE_AUTH_IDENTITY || 'user@proposaltracker.local';
+
 // User type based on PocketBase's users collection
 interface PocketBaseUser {
   id: string;
@@ -20,10 +25,8 @@ interface AuthContextType {
   user: PocketBaseUser | null;
   isAuthenticated: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (token: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: Error | null }>;
-  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -90,14 +93,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
+  const signIn = async (token: string): Promise<{ error: Error | null }> => {
     try {
-      await pb.collection('users').authWithPassword(email, password);
+      await pb.collection('users').authWithPassword(AUTH_IDENTITY, token);
       return { error: null };
     } catch (err: any) {
       console.error('Sign in error:', err);
       return {
-        error: new Error(err?.message || 'Invalid email or password')
+        error: new Error(err?.message || 'Invalid token')
       };
     }
   };
@@ -107,44 +110,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  const resetPassword = async (email: string): Promise<{ error: Error | null }> => {
-    try {
-      await pb.collection('users').requestPasswordReset(email);
-      return { error: null };
-    } catch (err: any) {
-      console.error('Password reset error:', err);
-      return {
-        error: new Error(err?.message || 'Failed to send password reset email')
-      };
-    }
-  };
-
-  const updatePassword = async (newPassword: string): Promise<{ error: Error | null }> => {
-    try {
-      if (!pb.authStore.model?.id) {
-        throw new Error('No authenticated user');
-      }
-      await pb.collection('users').update(pb.authStore.model.id, {
-        password: newPassword,
-        passwordConfirm: newPassword,
-      });
-      return { error: null };
-    } catch (err: any) {
-      console.error('Password update error:', err);
-      return {
-        error: new Error(err?.message || 'Failed to update password')
-      };
-    }
-  };
-
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     loading,
     signIn,
     signOut,
-    resetPassword,
-    updatePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

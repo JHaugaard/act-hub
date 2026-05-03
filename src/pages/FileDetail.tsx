@@ -51,6 +51,7 @@ export default function FileDetail() {
     updateDBNo,
     updateNotes,
     updateCayuse,
+    updateAgrId,
     updateDateReceived,
     updateStatusDate,
     deleteFile,
@@ -64,6 +65,7 @@ export default function FileDetail() {
   const [editingDBNo, setEditingDBNo] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [editingCayuse, setEditingCayuse] = useState(false);
+  const [editingAgrId, setEditingAgrId] = useState(false);
 
   // Loading states for individual fields
   const [savingPI, setSavingPI] = useState(false);
@@ -74,11 +76,13 @@ export default function FileDetail() {
   const [savingStatus, setSavingStatus] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
   const [savingCayuse, setSavingCayuse] = useState(false);
+  const [savingAgrId, setSavingAgrId] = useState(false);
 
   // Temporary values for editing
   const [tempDBNo, setTempDBNo] = useState('');
   const [tempNotes, setTempNotes] = useState('');
   const [tempCayuse, setTempCayuse] = useState('');
+  const [tempAgrId, setTempAgrId] = useState('');
 
   // Get PI and Sponsor data for autocomplete
   const { pis, createPI } = usePIs();
@@ -156,6 +160,14 @@ export default function FileDetail() {
     const success = await updateCayuse(tempCayuse.trim());
     if (success) setEditingCayuse(false);
     setSavingCayuse(false);
+  };
+
+  const handleAgrIdChange = async () => {
+    if (!file || savingAgrId) return;
+    setSavingAgrId(true);
+    const success = await updateAgrId(tempAgrId.trim());
+    if (success) setEditingAgrId(false);
+    setSavingAgrId(false);
   };
 
   const statusOptions = ['In', 'Process', 'Pending', 'Pending Signature', 'Pending Signatures', 'Done', 'On Hold', 'Withdrawn'];
@@ -461,6 +473,58 @@ export default function FileDetail() {
                     </div>
                   ) : (
                     <p className="font-medium">{file.cayuse || '-'}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-muted-foreground">Agreement ID</label>
+                  {!editingAgrId && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => {
+                        setTempAgrId(file.agr_id || '');
+                        setEditingAgrId(true);
+                      }}
+                      disabled={savingAgrId}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
+                <div className="mt-1">
+                  {editingAgrId ? (
+                    <div className="flex gap-2">
+                      <Input
+                        value={tempAgrId}
+                        onChange={(e) => setTempAgrId(e.target.value)}
+                        placeholder="Enter Agreement ID"
+                        disabled={savingAgrId}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={handleAgrIdChange}
+                        disabled={savingAgrId}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setEditingAgrId(false);
+                          setTempAgrId(file.agr_id || '');
+                        }}
+                        disabled={savingAgrId}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="font-medium">{file.agr_id || '-'}</p>
                   )}
                 </div>
               </div>

@@ -17,6 +17,7 @@ export interface FileDetailRecord {
   external_link: string | null;
   cayuse: string | null;
   to_set_up: string | null;
+  agr_id: string | null;
   created_at: string;
   updated_at: string;
   pi_id: string;
@@ -64,6 +65,7 @@ export function useMockFileDetail(fileId: string | undefined) {
         external_link: fileData.external_link,
         cayuse: fileData.cayuse,
         to_set_up: fileData.to_set_up,
+        agr_id: fileData.agr_id || null,
         created_at: fileData.created_at,
         updated_at: fileData.updated_at,
         pi_id: fileData.pi_id,
@@ -177,6 +179,17 @@ export function useMockFileDetail(fileId: string | undefined) {
     return success;
   }, [updateFile, toast]);
 
+  const updateAgrId = useCallback(async (agrId: string) => {
+    const success = await updateFile({ agr_id: agrId || null });
+    if (success) {
+      toast({
+        title: "Success",
+        description: "Agreement ID updated successfully.",
+      });
+    }
+    return success;
+  }, [updateFile, toast]);
+
   const updateDateReceived = useCallback(async (date: Date | undefined) => {
     const success = await updateFile({
       date_received: date?.toISOString().split('T')[0] || null,
@@ -239,6 +252,7 @@ export function useMockFileDetail(fileId: string | undefined) {
     updateDBNo,
     updateNotes,
     updateCayuse,
+    updateAgrId,
     updateDateReceived,
     updateStatusDate,
     deleteFile,

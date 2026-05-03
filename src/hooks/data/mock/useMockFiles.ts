@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { mockStorage, STORAGE_KEYS } from '@/lib/mockStorage';
 import { useToast } from '@/hooks/ui/use-toast';
-import type { FileRecord, SortField, SortDirection } from '@/hooks/useFiles';
+import type { FileRecord, SortField, SortDirection } from '@/hooks/data/pocketbase/usePocketBaseFiles';
 
 export function useMockFiles() {
   const [files, setFiles] = useState<FileRecord[]>([]);
@@ -87,7 +87,8 @@ export function useMockFiles() {
         file.pi_name.toLowerCase().includes(query) ||
         file.sponsor_name.toLowerCase().includes(query) ||
         file.cayuse?.toLowerCase().includes(query) ||
-        file.status.toLowerCase().includes(query)
+        file.status.toLowerCase().includes(query) ||
+        (file.agr_id || '').toLowerCase().includes(query)
       );
     }
 

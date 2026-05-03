@@ -14,7 +14,6 @@ const STORAGE_KEYS = {
   PIS: 'mock_pis',
   SPONSORS: 'mock_sponsors',
   FILE_ATTACHMENTS: 'mock_file_attachments',
-  ACTION_ITEMS: 'mock_action_items',
 };
 
 // Generic localStorage operations

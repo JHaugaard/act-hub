@@ -21,7 +21,6 @@ import { usePocketBaseDashboard } from './data/pocketbase/usePocketBaseDashboard
 import { usePocketBaseRelatedProposals } from './data/pocketbase/usePocketBaseRelatedProposals';
 import { usePocketBaseFileAttachments } from './data/pocketbase/usePocketBaseFileAttachments';
 import { usePocketBaseFileDetail } from './data/pocketbase/usePocketBaseFileDetail';
-import { usePocketBaseActionItems } from './data/pocketbase/usePocketBaseActionItems';
 
 // Mock hooks (development/testing)
 import { useMockFiles } from './data/mock/useMockFiles';
@@ -30,7 +29,6 @@ import { useMockDashboard } from './data/mock/useMockDashboard';
 import { useMockRelatedProposals } from './data/mock/useMockRelatedProposals';
 import { useMockFileAttachments } from './data/mock/useMockFileAttachments';
 import { useMockFileDetail } from './data/mock/useMockFileDetail';
-import { useMockActionItems } from './data/mock/useMockActionItems';
 
 // Initialize mock data if using mock mode
 if (USE_MOCK_DATA) {
@@ -47,11 +45,8 @@ export const useDashboard = USE_MOCK_DATA ? useMockDashboard : usePocketBaseDash
 export const useRelatedProposals = USE_MOCK_DATA ? useMockRelatedProposals : usePocketBaseRelatedProposals;
 export const useFileAttachments = USE_MOCK_DATA ? useMockFileAttachments : usePocketBaseFileAttachments;
 export const useFileDetail = USE_MOCK_DATA ? useMockFileDetail : usePocketBaseFileDetail;
-export const useActionItems = USE_MOCK_DATA ? useMockActionItems : usePocketBaseActionItems;
 
 // Export types from PocketBase hooks
 export type { FileRecord, SortField, SortDirection } from './data/pocketbase/usePocketBaseFiles';
 export type { PI, Sponsor } from './data/pocketbase/usePocketBaseProposalData';
 export type { FileDetailRecord } from './data/pocketbase/usePocketBaseFileDetail';
-export type { ActionItem, TaskCategory, CreateActionItemInput, UpdateActionItemInput } from '@/types/actionItem';
-export { TASK_CATEGORIES } from '@/types/actionItem';

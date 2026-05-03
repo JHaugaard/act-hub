@@ -1,4 +1,4 @@
-import { FileText, Users, Building2, Database, User, Edit, LogOut, Zap, CheckSquare } from 'lucide-react';
+import { FileText, Users, Building2, Database, User, Edit, LogOut, Zap } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { pb } from '@/integrations/pocketbase/client';
@@ -35,10 +35,6 @@ const navigationItems = [
   { title: 'PIs', url: '/pis', icon: Users },
   { title: 'Sponsors', url: '/sponsors', icon: Building2 },
   { title: 'DB Distiller', url: '/distiller', icon: Zap },
-];
-
-const bottomNavigationItems = [
-  { title: 'Action Items', url: '/action-items', icon: CheckSquare },
 ];
 
 export function AppSidebar() {
@@ -195,27 +191,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
 
-          {/* Spacer to push Action Items to bottom */}
-          <div className="flex-1" />
-
-          {/* Action Items - separated at bottom */}
-          <div className="border-t pt-2 mt-2">
-            <SidebarMenu>
-              {bottomNavigationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className={getNavCls}
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </div>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

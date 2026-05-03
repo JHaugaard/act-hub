@@ -24,6 +24,7 @@ const proposalFormSchema = z.object({
   pi_id: z.string().min(1, 'PI is required'),
   sponsor_id: z.string().min(1, 'Sponsor is required'),
   cayuse: z.string().optional(),
+  agr_id: z.string().optional(),
   status: z.enum(['In', 'Pending', 'Pending Signatures', 'Process', 'Done', 'On Hold', 'Withdrawn']),
   date_received: z.date({ required_error: 'Date received is required' }),
   notes: z.string().optional(),
@@ -58,6 +59,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
     defaultValues: {
       status: 'In',
       cayuse: '',
+      agr_id: '',
       notes: '',
     },
   });
@@ -76,6 +78,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
         sponsor_id: editingFile.sponsor_id,
         status: normalizedStatus,
         cayuse: editingFile.cayuse || '',
+        agr_id: editingFile.agr_id || '',
         notes: editingFile.notes || '',
         date_received: editingFile.date_received ? new Date(editingFile.date_received) : undefined,
       });
@@ -83,6 +86,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
       form.reset({
         status: 'In',
         cayuse: '',
+        agr_id: '',
         notes: '',
       });
     }
@@ -136,6 +140,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
           pi_id: string;
           sponsor_id: string;
           cayuse: string | null;
+          agr_id: string | null;
           status: string;
           date_received: string;
           notes: string | null;
@@ -145,6 +150,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
           pi_id: data.pi_id,
           sponsor_id: data.sponsor_id,
           cayuse: data.cayuse || null,
+          agr_id: data.agr_id || null,
           status: data.status,
           date_received: format(data.date_received, 'yyyy-MM-dd'),
           notes: data.notes || null,
@@ -164,6 +170,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
           pi_id: data.pi_id,
           sponsor_id: data.sponsor_id,
           cayuse: data.cayuse || null,
+          agr_id: data.agr_id || null,
           status: data.status,
           date_received: format(data.date_received, 'yyyy-MM-dd'),
           notes: data.notes || null,
@@ -193,6 +200,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
         sponsor_id: editingFile.sponsor_id,
         status: editingFile.status,
         cayuse: editingFile.cayuse || '',
+        agr_id: editingFile.agr_id || '',
         notes: editingFile.notes || '',
         date_received: editingFile.date_received ? new Date(editingFile.date_received) : undefined,
       });
@@ -201,6 +209,7 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
       form.reset({
         status: 'In',
         cayuse: '',
+        agr_id: '',
         notes: '',
       });
     }
@@ -311,6 +320,17 @@ export function ProposalForm({ onSuccess, editingFile }: ProposalFormProps) {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="agr_id">Agreement ID</Label>
+              <Input
+                id="agr_id"
+                {...form.register('agr_id')}
+                placeholder="Enter Agreement ID"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Date Received *</Label>
               <Popover>

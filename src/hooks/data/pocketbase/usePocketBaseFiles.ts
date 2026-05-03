@@ -19,6 +19,7 @@ export interface FileRecord {
   external_link: string | null;
   cayuse: string | null;
   to_set_up: string | null;
+  agr_id: string | null;
   created_at: string;
   updated_at: string;
   pi_id: string;
@@ -79,6 +80,7 @@ export function usePocketBaseFiles() {
         external_link: record.external_link,
         cayuse: record.cayuse,
         to_set_up: record.to_set_up,
+        agr_id: record.agr_id || null,
         created_at: record.created_at,
         updated_at: record.updated_at,
         pi_id: record.pi_id,
@@ -143,6 +145,7 @@ export function usePocketBaseFiles() {
     date_received: string;
     cayuse?: string | null;
     notes?: string | null;
+    agr_id?: string | null;
   }): Promise<boolean> => {
     try {
       await pb.collection('files').create({
@@ -167,6 +170,7 @@ export function usePocketBaseFiles() {
       date_received?: string;
       cayuse?: string | null;
       notes?: string | null;
+      agr_id?: string | null;
       date_status_change?: string;
     }
   ): Promise<boolean> => {
@@ -198,7 +202,8 @@ export function usePocketBaseFiles() {
       !searchQuery ||
       file.db_no.toLowerCase().includes(searchQuery.toLowerCase()) ||
       file.pi_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      file.sponsor_name.toLowerCase().includes(searchQuery.toLowerCase());
+      file.sponsor_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (file.agr_id || '').toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesStatus && matchesSearch;
   });

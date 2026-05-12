@@ -30,3 +30,9 @@ Completed. Branch `cleanup-agr-id` merged to main and deployed to production.
 
 ## Notes
 - Session started: 2026-05-02
+
+## Session Status
+Completed: 2026-05-03
+Servers cleaned: No MCP servers added this session
+Honcho curation: Skipped (transient DNS error at session-end; not systemic)
+Infrastructure cleanup: Updated Honcho config session paths (vault-life, dev-meanderings, act-hub all corrected to vps8 locations); added ~/.claude/rules/infrastructure.md documenting new VPS layout

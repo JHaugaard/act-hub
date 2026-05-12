@@ -53,3 +53,7 @@ pocketbase-data/
 *.tmp
 *.temp
 *~
+
+# Session and Context
+session-context.md
+status.md

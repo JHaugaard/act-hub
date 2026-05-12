@@ -8,7 +8,7 @@ export interface ProposalRecord {
   gco_gca_scco?: string;
   date_received?: string;
   to_set_up?: string;
-  cayuse?: string;
+  proposal_id?: string;
   notes?: string;
   status_date?: string;
   old_db?: string;
@@ -30,7 +30,7 @@ const COLUMN_MAPPINGS = {
   gco_gca_scco: ['gco/gca/scco', 'gco', 'gca', 'scco', 'gco gca scco', 'gco_gca_scco'],
   date_received: ['date_received', 'date received', 'received date', 'submission date'],
   to_set_up: ['to_set_up', 'to set up', 'setup date', 'due date'],
-  cayuse: ['cayuse', 'cayuse number', 'cayuse id'],
+  proposal_id: ['proposal id', 'proposalid', 'cayuse', 'cayuse number', 'cayuse id'],
   notes: ['notes', 'comments', 'remarks'],
   status_date: ['status_date', 'status date', 'date status', 'status changed'],
   old_db: ['old_db', 'old db', 'old database', 'old db#', 'previous db']
@@ -81,7 +81,7 @@ export function processExcelFile(file: File): Promise<ProcessedData> {
               gco_gca_scco: getCellValue(row, columnMap.gco_gca_scco),
               date_received: formatDate(getCellValue(row, columnMap.date_received)),
               to_set_up: formatDate(getCellValue(row, columnMap.to_set_up)),
-              cayuse: getCellValue(row, columnMap.cayuse),
+              proposal_id: getCellValue(row, columnMap.proposal_id),
               notes: getCellValue(row, columnMap.notes),
               status_date: formatDate(getCellValue(row, columnMap.status_date)),
               old_db: getCellValue(row, columnMap.old_db)

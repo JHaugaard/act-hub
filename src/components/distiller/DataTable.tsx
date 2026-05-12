@@ -78,7 +78,7 @@ export function DataTable({ records, totalRecords, isLoading }: DataTableProps) 
                 <th className="text-left p-2 font-medium">Date Received</th>
                 <th className="text-left p-2 font-medium">Principal Investigator</th>
                 <th className="text-left p-2 font-medium">Sponsor/Contractor</th>
-                <th className="text-left p-2 font-medium">Cayuse ID</th>
+                <th className="text-left p-2 font-medium">Proposal ID</th>
                 <th className="text-left p-2 font-medium">Status</th>
                 <th className="text-left p-2 font-medium">Status Date</th>
                 <th className="text-left p-2 font-medium">Old DB#</th>
@@ -91,7 +91,7 @@ export function DataTable({ records, totalRecords, isLoading }: DataTableProps) 
                   <td className="px-2 py-1 text-sm">{formatDisplayDate(record.date_received) || '-'}</td>
                   <td className="px-2 py-1">{record.pi_name}</td>
                   <td className="px-2 py-1">{record.sponsor_name}</td>
-                  <td className="px-2 py-1 text-sm">{record.cayuse || '-'}</td>
+                  <td className="px-2 py-1 text-sm">{record.proposal_id || '-'}</td>
                   <td className="px-2 py-1">
                     <Badge variant="secondary" className={getStatusColor(record.status)}>
                       {record.status}

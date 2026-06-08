@@ -170,7 +170,7 @@ export default function FileDetail() {
     setSavingAgrId(false);
   };
 
-  const statusOptions = ['In', 'Process', 'Pending', 'Pending Signature', 'Pending Signatures', 'Done', 'On Hold', 'Withdrawn'];
+  const statusOptions = ['In', 'Process', 'Pending', 'Pending Signatures', 'Done', 'On Hold', 'Withdrawn'];
 
   if (loading) {
     return (

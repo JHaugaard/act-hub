@@ -62,14 +62,8 @@ interface FileData {
 
 const VALID_STATUSES = ['In', 'Pending', 'Pending Signatures', 'Process', 'Done', 'On Hold', 'Withdrawn'];
 
-// Normalize status values to handle common variations
 function normalizeStatus(status: string): string {
-  const trimmed = status.trim();
-  // Map "Pending Signature" (singular) to "Pending Signatures" (plural)
-  if (trimmed === 'Pending Signature') {
-    return 'Pending Signatures';
-  }
-  return trimmed;
+  return status.trim();
 }
 
 export function useDataImport() {

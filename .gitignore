@@ -57,3 +57,6 @@ pocketbase-data/
 # Session and Context
 session-context.md
 status.md
+
+# Claude Code local settings (may contain machine-specific permission history)
+.claude/settings.local.json

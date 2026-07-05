@@ -1,38 +1,20 @@
-# Session Context - May 2, 2026
+# Session Context
 
 ## Current Focus
-Completed. Branch `cleanup-agr-id` merged to main and deployed to production.
+redeploy-assess: Considering a redeploy of act-hub (currently on Fly.io). Goal is a tidy repo before proceeding — sweep for cruft candidates to move into `/home/john/dev/cruft/<named-subfolder>` (never delete).
 
-## Completed This Session
-
-### 1. Removed Action Items feature
-- Deleted 6 files: type, page, table component, dialog, PocketBase hook, mock hook
-- Cleaned 5 files: App.tsx (route), useData.ts (imports/exports), AppSidebar.tsx (nav + CheckSquare icon), Dashboard.tsx (state + button + dialog), mockStorage.ts (storage key)
-
-### 2. Added Agreement ID (`agr_id`) field
-- PocketBase migration: `pocketbase-data/migrations/1777770192_updated_files_add_agr_id.js`
-  - **Production**: field added manually via PocketBase Admin UI
-- TypeScript: `agr_id: string | null` added to `FileRecord` and `FileDetailRecord` in both PocketBase and mock hooks
-- ProposalForm: "Agreement ID" input field, paired with Cayuse
-- FileDetail: inline-editable field in Proposal Information card
-- Search: `agr_id` included in filter in both mock and PocketBase hooks
-- mockData: `agr_id: null` added to all generated proposals
-- Also fixed broken import in `useMockFiles.ts` (`@/hooks/useFiles` → correct path)
-
-### 3. Branch workflow
-- Branch: `cleanup-agr-id` → fast-forward merged to `main`
-- CI + deploy both passed on GitHub Actions
-- Live at https://proposaltracker.net
+## Honcho Context
+- act-hub = proposaltracker.net, React/Vite frontend + PocketBase/SQLite backend, deployed on Fly.io.
+- Fly apps: `proposaltracker-api` (active, PocketBase backend), `proposaltracker-web` (suspended, frontend).
+- Deploy mechanics: push to GitHub → CI/CD deploys to Fly.io. Requires SSH agent running on vps8 for the GitHub key (`~/.ssh/id_ed25519_github`); known issue that it doesn't auto-start.
+- Last known clean push: commit `b42dc46` (June 8, 2026).
+- Established cruft pattern (from mccoy-tyner project cleanup): move stale/superseded items to `/home/john/dev/cruft/<name>/`, never delete; confirm clean git status before pushing.
+- Known risk flagged: check for a leftover `/home/john/dev/stable/act-hub-broken/` directory from a May 1 re-clone — **checked this session, does not exist.**
+- Pre-redeploy checklist from Honcho: confirm SSH agent, git status clean, git log matches Fly.io state, review docs/.claude for stale artifacts, check fly.toml for config drift, verify proposaltracker-api health, then push.
 
 ## Key Decisions
-- `agr_id` is searchable and editable on proposal detail, but NOT a column in the proposals list table
-- DB No. remains the daily reference; agr_id is for future transition
+-
 
 ## Notes
-- Session started: 2026-05-02
-
-## Session Status
-Completed: 2026-05-03
-Servers cleaned: No MCP servers added this session
-Honcho curation: Skipped (transient DNS error at session-end; not systemic)
-Infrastructure cleanup: Updated Honcho config session paths (vault-life, dev-meanderings, act-hub all corrected to vps8 locations); added ~/.claude/rules/infrastructure.md documenting new VPS layout
+- Session started: 2026-07-05
+- Untracked at session start: `tailnet-migation/vps8-tailnet-app-deploy-pattern.md` (single doc, not yet committed) — needs a decision: commit, or move out of repo.
